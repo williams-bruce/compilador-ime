@@ -1,4 +1,4 @@
-var x = 123;
+var x = 1234;
 var name = "hello world";
 var char = 'a';
 if (x > 0) {
