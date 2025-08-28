@@ -2,6 +2,7 @@
 
 from enum import Enum, auto
 from dataclasses import dataclass
+from typing import Optional
 
 class TokenType(Enum):
     """Enumeration for all token types."""
@@ -72,7 +73,7 @@ class Token:
     lexeme: str
     line: int
     col: int
-    secondary_token: int | None = None
+    secondary_token: Optional[int] = None
 
     def __str__(self):
         """String representation for easy debugging."""
