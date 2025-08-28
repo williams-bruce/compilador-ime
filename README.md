@@ -24,3 +24,11 @@ python lexical.py test.txt
 ```
 
 The program will print the stream of recognized tokens followed by the final state of the Symbol Table.
+
+---
+
+### Grammar
+
+Here is the grammar that the lexical analyzer is built to recognize:
+
+<img src="./grammar.png" alt="Lexical Analyzer Grammar" width="600">
