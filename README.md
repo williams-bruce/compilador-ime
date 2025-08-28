@@ -6,11 +6,11 @@ This repository contains a complete lexical analyzer built in Python for a simpl
 
 ### What is a Lexical Analyzer?
 
-A lexical analyzer, also known as a **scanner**, is the first phase of a compiler[cite: 77]. [cite_start]Its main responsibility is to read the raw source code as a stream of characters and group them into meaningful sequences called **lexemes**[cite: 77]. [cite_start]For each valid lexeme, it generates a corresponding **token**, which is typically a numerical value that represents the lexeme's category (e.g., 'identifier', 'keyword', or 'operator')[cite: 77, 81].
+A lexical analyzer, also known as a **scanner**, is the first phase of a compiler. Its main responsibility is to read the raw source code as a stream of characters and group them into meaningful sequences called **lexemes**. For each valid lexeme, it generates a corresponding **token**, which is typically a numerical value that represents the lexeme's category (e.g., 'identifier', 'keyword', or 'operator').
 
-This process simplifies the work for the next phase (the parser) by abstracting the raw text into a uniform stream of tokens[cite: 80]. [cite_start]For example, different identifiers like `my_variable` and `counter` are both categorized under a single `ID` token[cite: 86]. [cite_start]To distinguish them, the analyzer also provides a **secondary token** (often a pointer to a symbol table entry) that holds the actual value or reference for the lexeme[cite: 87, 88].
+This process simplifies the work for the next phase (the parser) by abstracting the raw text into a uniform stream of tokens. For example, different identifiers like `my_variable` and `counter` are both categorized under a single `ID` token. To distinguish them, the analyzer also provides a **secondary token** (often a pointer to a symbol table entry) that holds the actual value or reference for the lexeme.
 
-Because the set of all valid lexemes in a programming language can be described by regular expressions, a lexical analyzer is typically implemented as a **Finite Automaton**[cite: 89].
+Because the set of all valid lexemes in a programming language can be described by regular expressions, a lexical analyzer is typically implemented as a **Finite Automaton**.
 
 ---
 
