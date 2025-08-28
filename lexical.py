@@ -2,9 +2,9 @@
 
 import re
 import sys
-from typing import Dict, List, Tuple, Optional, Generator
-
+from typing import Dict, List, Generator
 from tokens import Token, TokenType, KEYWORDS
+
 
 class SymbolTable:
     """Manages identifiers and constants to avoid duplication."""
@@ -14,6 +14,7 @@ class SymbolTable:
         self._next_id_index = 0
         self._const_map: Dict[str, int] = {}
 
+
     def lookup_or_add_identifier(self, name: str) -> int:
         """Adds an identifier if new, returns its unique index."""
         if name not in self.identifiers:
@@ -21,12 +22,14 @@ class SymbolTable:
             self._next_id_index += 1
         return self.identifiers[name]
 
+
     def add_constant(self, value: str) -> int:
         """Adds a constant literal if new, returns its unique index."""
         if value not in self._const_map:
             self._const_map[value] = len(self.constants)
             self.constants.append(value)
         return self._const_map[value]
+
 
     def __str__(self) -> str:
         """Provides a formatted string of the symbol table's contents."""
@@ -102,11 +105,13 @@ class Lexer:
     # Master regex to match all token patterns
     TOKEN_REGEX = re.compile('|'.join(f'(?P<{name}>{pattern})' for name, pattern in TOKEN_SPECIFICATION))
 
+
     def __init__(self, source_code: str):
         self.source_code = source_code
         self.symbol_table = SymbolTable()
         self.line_num = 1
         self.line_start_pos = 0
+
 
     def tokenize(self) -> Generator[Token, None, None]:
         """Yields tokens from the source code."""

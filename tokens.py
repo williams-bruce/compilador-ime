@@ -6,13 +6,28 @@ from typing import Optional
 
 class TokenType(Enum):
     """Enumeration for all token types."""
-    # Literals and Identifiers
-    ID = auto()
-    NUMERAL = auto()
-    CHARACTER = auto()
-    STRING = auto()
 
-    # Single-character symbols
+    # Palavras reservadas
+    ARRAY = auto()
+    BOOLEAN = auto()
+    BREAK = auto()
+    CHAR = auto()
+    CONTINUE = auto()
+    DO = auto()
+    ELSE = auto()
+    FALSE = auto()
+    FUNCTION = auto()
+    IF = auto()
+    INTEGER = auto()
+    OF = auto()
+    STRING = auto()
+    STRUCT = auto()
+    TRUE = auto()
+    TYPE = auto()
+    VAR = auto()
+    WHILE = auto()
+
+    # Simbolos
     COLON = auto()          # :
     PLUS = auto()           # +
     MINUS = auto()          # -
@@ -32,7 +47,7 @@ class TokenType(Enum):
     GREATER_THAN = auto()   # >
     NOT = auto()            # !
 
-    # Multi-character operators
+    # Operadores
     PLUS_PLUS = auto()      # ++
     MINUS_MINUS = auto()    # --
     EQUAL_EQUAL = auto()    # ==
@@ -42,26 +57,13 @@ class TokenType(Enum):
     GREATER_OR_EQUAL = auto() # >=
     NOT_EQUAL = auto()      # !=
 
-    # Keywords
-    ARRAY = auto()
-    BOOLEAN = auto()
-    BREAK = auto()
-    CHAR = auto()
-    CONTINUE = auto()
-    DO = auto()
-    ELSE = auto()
-    FALSE = auto()
-    FUNCTION = auto()
-    IF = auto()
-    INTEGER = auto()
-    OF = auto()
-    STRUCT = auto()
-    TRUE = auto()
-    TYPE = auto()
-    VAR = auto()
-    WHILE = auto()
+    # Tokens regulares
+    CHARACTER = auto()
+    NUMERAL = auto()
+    STRINGVAL = auto()
+    ID = auto()
 
-    # Control tokens
+    # Tokens desconhecidos
     EOF = auto()
     UNKNOWN = auto()
 
