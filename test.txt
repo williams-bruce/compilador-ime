@@ -1,0 +1,6 @@
+var x = 123;
+var name = "hello world";
+var char = 'a';
+if (x > 0) {
+    x = x + 1;
+}
