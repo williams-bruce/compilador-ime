@@ -15,8 +15,6 @@ Because the set of all valid lexemes in a programming language can be described 
 ---
 
 
-## How to Use
-
 ### Running the Analyzer
 
 To analyze a source code file (e.g., `test.txt`), run the `lexical.py` script from your terminal and pass the filename as a command-line argument:
