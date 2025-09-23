@@ -99,7 +99,8 @@ class SyntaticalAnalyzer:
         
         while q != 1:
             print(f'pilha: {self.stack}')
-            p = self.action(q, a.type.name)
+            tok_name = '$end' if a.type.name == 'EOF' else a.type.name
+            p = self.action(q, tok_name)
             try:
                 p = int(p)
             except:
@@ -114,7 +115,8 @@ class SyntaticalAnalyzer:
                 self.pop(self.len_rules[r])
                 self.push(self.action(self.top(), self.left_side_of_rules[r]))
             else:
-                raise Exception(f"SytntaxError: {a.type.name} in line {a.line}. Lexeme: \'{a.lexeme}\'. column: {a.col}")
+                raise Exception(f"SytntaxError: {tok_name} in line {a.line}. Lexeme: \'{a.lexeme}\'. column: {a.col}")
 
             q = self.top()
         
+        print("\nAnalysis completed successfully")

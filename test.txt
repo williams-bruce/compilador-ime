@@ -1,7 +1,1 @@
-var x: integer;
-if (x > 0) {
-    x = x + 1;
-}
-while (!(x > 1)) {
-    x = x + 1;
-}
+type idade = array[10] of integer
