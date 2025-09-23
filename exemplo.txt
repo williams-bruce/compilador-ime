@@ -1,0 +1,13 @@
+type lista = array [10] of integer
+
+var x, y : integer;
+var nome : string;
+
+function soma(a : integer, b : integer) : integer {
+    var resultado : integer;
+    resultado = a + b;
+    
+    if (a > 0) {
+        resultado = resultado + 1;
+    }
+}

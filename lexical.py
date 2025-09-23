@@ -10,8 +10,8 @@ class SymbolTable:
     """Manages identifiers and constants to avoid duplication."""
     def __init__(self):
         self.identifiers: Dict[str, int] = {}
+        self._next_id_index: int = 0
         self.constants: List[str] = []
-        self._next_id_index = 0
         self._const_map: Dict[str, int] = {}
 
 
@@ -74,7 +74,8 @@ class Lexer:
         ('STRING',          r'"(?:\\.|[^"\\])*"'),  # Handles escaped quotes
         ('CHARACTER',       r"'(.)'"),
         ('NUMERAL',         r'\d+'),
-        ('ID',              r'[a-zA-Z_][a-zA-Z0-9_]*'),
+        ('IDD',              r'[a-zA-Z_][a-zA-Z0-9_]*'),
+        ('IDU',              r'[a-zA-Z_][a-zA-Z0-9_]*'),
 
         # --- Single-character symbols ---
         ('PLUS',            r'\+'),
@@ -135,12 +136,12 @@ class Lexer:
                 continue
             
             token_type = TokenType[token_type_name]
-            secondary_token = None
+            secondary_token: int|None = None
 
-            if token_type == TokenType.ID:
+            if token_type == TokenType.IDD or token_type == TokenType.IDU:
                 # Check if the identifier is a keyword
-                token_type = KEYWORDS.get(lexeme, TokenType.ID)
-                if token_type == TokenType.ID:
+                token_type = KEYWORDS.get(lexeme, TokenType.IDD)
+                if token_type == TokenType.IDD or token_type == TokenType.IDU:
                     secondary_token = self.symbol_table.lookup_or_add_identifier(lexeme)
 
             elif token_type in (TokenType.NUMERAL, TokenType.STRING, TokenType.CHARACTER):

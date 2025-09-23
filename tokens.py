@@ -61,7 +61,8 @@ class TokenType(Enum):
     CHARACTER = auto()
     NUMERAL = auto()
     STRINGVAL = auto()
-    ID = auto()
+    IDD = auto()
+    IDU = auto()
 
     # Tokens desconhecidos
     EOF = auto()

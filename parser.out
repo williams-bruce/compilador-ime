@@ -1,0 +1,3202 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Grammar
+
+Rule 0     S' -> programa
+Rule 1     programa -> lista_declaracoes_externas
+Rule 2     lista_declaracoes_externas -> declaracao_externa
+Rule 3     lista_declaracoes_externas -> lista_declaracoes_externas declaracao_externa
+Rule 4     declaracao_externa -> declaracao_tipo
+Rule 5     declaracao_externa -> declaracao_funcao
+Rule 6     declaracao_externa -> declaracao_variavel
+Rule 7     tipo -> INTEGER
+Rule 8     tipo -> CHAR
+Rule 9     tipo -> BOOLEAN
+Rule 10    tipo -> STRING
+Rule 11    tipo -> IDU
+Rule 12    declaracao_tipo -> TYPE IDD EQUALS ARRAY LEFT_SQUARE NUMERAL RIGHT_SQUARE OF tipo
+Rule 13    declaracao_tipo -> TYPE IDD EQUALS STRUCT LEFT_BRACES declaracao_campos RIGHT_BRACES
+Rule 14    declaracao_tipo -> TYPE IDD EQUALS tipo
+Rule 15    declaracao_campos -> declaracao_campos SEMI_COLON lista_identificadores COLON tipo
+Rule 16    declaracao_campos -> lista_identificadores COLON tipo
+Rule 17    declaracao_funcao -> FUNCTION IDD LEFT_PARENTHESIS lista_parametros RIGHT_PARENTHESIS COLON tipo bloco
+Rule 18    lista_parametros -> lista_parametros COMMA IDD COLON tipo
+Rule 19    lista_parametros -> IDD COLON tipo
+Rule 20    bloco -> LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES
+Rule 21    lista_declaracao_variaveis -> lista_declaracao_variaveis declaracao_variavel
+Rule 22    lista_declaracao_variaveis -> declaracao_variavel
+Rule 23    lista_comandos -> lista_comandos comando
+Rule 24    lista_comandos -> comando
+Rule 25    declaracao_variavel -> VAR lista_identificadores COLON tipo SEMI_COLON
+Rule 26    lista_identificadores -> lista_identificadores COMMA IDD
+Rule 27    lista_identificadores -> IDD
+Rule 28    comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+Rule 29    comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE comando
+Rule 30    comando -> WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+Rule 31    comando -> DO comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
+Rule 32    comando -> bloco
+Rule 33    comando -> valor_esquerdo EQUALS expressao SEMI_COLON
+Rule 34    comando -> BREAK SEMI_COLON
+Rule 35    comando -> CONTINUE SEMI_COLON
+Rule 36    expressao -> expressao AND expressao_l
+Rule 37    expressao -> expressao OR expressao_l
+Rule 38    expressao -> expressao_l
+Rule 39    expressao_l -> expressao_l LESS_THAN expressao_r
+Rule 40    expressao_l -> expressao_l LESS_OR_EQUAL expressao_r
+Rule 41    expressao_l -> expressao_l GREATER_THAN expressao_r
+Rule 42    expressao_l -> expressao_l GREATER_OR_EQUAL expressao_r
+Rule 43    expressao_l -> expressao_l EQUAL_EQUAL expressao_r
+Rule 44    expressao_l -> expressao_l NOT_EQUAL expressao_r
+Rule 45    expressao_l -> expressao_r
+Rule 46    expressao_r -> expressao_r PLUS expressao_y
+Rule 47    expressao_r -> expressao_r MINUS expressao_y
+Rule 48    expressao_r -> expressao_y
+Rule 49    expressao_y -> expressao_y TIMES expressao_f
+Rule 50    expressao_y -> expressao_y DIVIDE expressao_f
+Rule 51    expressao_y -> expressao_f
+Rule 52    expressao_f -> valor_esquerdo
+Rule 53    expressao_f -> PLUS_PLUS valor_esquerdo
+Rule 54    expressao_f -> MINUS_MINUS valor_esquerdo
+Rule 55    expressao_f -> valor_esquerdo PLUS_PLUS
+Rule 56    expressao_f -> valor_esquerdo MINUS_MINUS
+Rule 57    expressao_f -> LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+Rule 58    expressao_f -> IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+Rule 59    expressao_f -> MINUS expressao_f
+Rule 60    expressao_f -> NOT expressao_f
+Rule 61    expressao_f -> TRUE
+Rule 62    expressao_f -> FALSE
+Rule 63    expressao_f -> CHARACTER
+Rule 64    expressao_f -> STRINGVAL
+Rule 65    expressao_f -> NUMERAL
+Rule 66    lista_expressoes -> lista_expressoes COMMA expressao
+Rule 67    lista_expressoes -> expressao
+Rule 68    valor_esquerdo -> valor_esquerdo DOT IDU
+Rule 69    valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+Rule 70    valor_esquerdo -> IDU
+
+Terminals, with rules where they appear
+
+AND                  : 36
+ARRAY                : 12
+BOOLEAN              : 9
+BREAK                : 34
+CHAR                 : 8
+CHARACTER            : 63
+COLON                : 15 16 17 18 19 25
+COMMA                : 18 26 66
+CONTINUE             : 35
+DIVIDE               : 50
+DO                   : 31
+DOT                  : 68
+ELSE                 : 29
+EQUALS               : 12 13 14 33
+EQUAL_EQUAL          : 43
+FALSE                : 62
+FUNCTION             : 17
+GREATER_OR_EQUAL     : 42
+GREATER_THAN         : 41
+IDD                  : 12 13 14 17 18 19 26 27
+IDU                  : 11 58 68 70
+IF                   : 28 29
+INTEGER              : 7
+LEFT_BRACES          : 13 20
+LEFT_PARENTHESIS     : 17 28 29 30 31 57 58
+LEFT_SQUARE          : 12 69
+LESS_OR_EQUAL        : 40
+LESS_THAN            : 39
+MINUS                : 47 59
+MINUS_MINUS          : 54 56
+NOT                  : 60
+NOT_EQUAL            : 44
+NUMERAL              : 12 65
+OF                   : 12
+OR                   : 37
+PLUS                 : 46
+PLUS_PLUS            : 53 55
+RIGHT_BRACES         : 13 20
+RIGHT_PARENTHESIS    : 17 28 29 30 31 57 58
+RIGHT_SQUARE         : 12 69
+SEMI_COLON           : 15 25 31 33 34 35
+STRING               : 10
+STRINGVAL            : 64
+STRUCT               : 13
+TIMES                : 49
+TRUE                 : 61
+TYPE                 : 12 13 14
+VAR                  : 25
+WHILE                : 30 31
+error                : 
+
+Nonterminals, with rules where they appear
+
+bloco                : 17 32
+comando              : 23 24 28 29 29 30 31
+declaracao_campos    : 13 15
+declaracao_externa   : 2 3
+declaracao_funcao    : 5
+declaracao_tipo      : 4
+declaracao_variavel  : 6 21 22
+expressao            : 28 29 30 31 33 36 37 57 66 67 69
+expressao_f          : 49 50 51 59 60
+expressao_l          : 36 37 38 39 40 41 42 43 44
+expressao_r          : 39 40 41 42 43 44 45 46 47
+expressao_y          : 46 47 48 49 50
+lista_comandos       : 20 23
+lista_declaracao_variaveis : 20 21
+lista_declaracoes_externas : 1 3
+lista_expressoes     : 58 66
+lista_identificadores : 15 16 25 26
+lista_parametros     : 17 18
+programa             : 0
+tipo                 : 12 14 15 16 17 18 19 25
+valor_esquerdo       : 33 52 53 54 55 56 68 69
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . programa
+    (1) programa -> . lista_declaracoes_externas
+    (2) lista_declaracoes_externas -> . declaracao_externa
+    (3) lista_declaracoes_externas -> . lista_declaracoes_externas declaracao_externa
+    (4) declaracao_externa -> . declaracao_tipo
+    (5) declaracao_externa -> . declaracao_funcao
+    (6) declaracao_externa -> . declaracao_variavel
+    (12) declaracao_tipo -> . TYPE IDD EQUALS ARRAY LEFT_SQUARE NUMERAL RIGHT_SQUARE OF tipo
+    (13) declaracao_tipo -> . TYPE IDD EQUALS STRUCT LEFT_BRACES declaracao_campos RIGHT_BRACES
+    (14) declaracao_tipo -> . TYPE IDD EQUALS tipo
+    (17) declaracao_funcao -> . FUNCTION IDD LEFT_PARENTHESIS lista_parametros RIGHT_PARENTHESIS COLON tipo bloco
+    (25) declaracao_variavel -> . VAR lista_identificadores COLON tipo SEMI_COLON
+
+    TYPE            shift and go to state 7
+    FUNCTION        shift and go to state 8
+    VAR             shift and go to state 9
+
+    programa                       shift and go to state 1
+    lista_declaracoes_externas     shift and go to state 2
+    declaracao_externa             shift and go to state 3
+    declaracao_tipo                shift and go to state 4
+    declaracao_funcao              shift and go to state 5
+    declaracao_variavel            shift and go to state 6
+
+state 1
+
+    (0) S' -> programa .
+
+
+
+state 2
+
+    (1) programa -> lista_declaracoes_externas .
+    (3) lista_declaracoes_externas -> lista_declaracoes_externas . declaracao_externa
+    (4) declaracao_externa -> . declaracao_tipo
+    (5) declaracao_externa -> . declaracao_funcao
+    (6) declaracao_externa -> . declaracao_variavel
+    (12) declaracao_tipo -> . TYPE IDD EQUALS ARRAY LEFT_SQUARE NUMERAL RIGHT_SQUARE OF tipo
+    (13) declaracao_tipo -> . TYPE IDD EQUALS STRUCT LEFT_BRACES declaracao_campos RIGHT_BRACES
+    (14) declaracao_tipo -> . TYPE IDD EQUALS tipo
+    (17) declaracao_funcao -> . FUNCTION IDD LEFT_PARENTHESIS lista_parametros RIGHT_PARENTHESIS COLON tipo bloco
+    (25) declaracao_variavel -> . VAR lista_identificadores COLON tipo SEMI_COLON
+
+    $end            reduce using rule 1 (programa -> lista_declaracoes_externas .)
+    TYPE            shift and go to state 7
+    FUNCTION        shift and go to state 8
+    VAR             shift and go to state 9
+
+    declaracao_externa             shift and go to state 10
+    declaracao_tipo                shift and go to state 4
+    declaracao_funcao              shift and go to state 5
+    declaracao_variavel            shift and go to state 6
+
+state 3
+
+    (2) lista_declaracoes_externas -> declaracao_externa .
+
+    TYPE            reduce using rule 2 (lista_declaracoes_externas -> declaracao_externa .)
+    FUNCTION        reduce using rule 2 (lista_declaracoes_externas -> declaracao_externa .)
+    VAR             reduce using rule 2 (lista_declaracoes_externas -> declaracao_externa .)
+    $end            reduce using rule 2 (lista_declaracoes_externas -> declaracao_externa .)
+
+
+state 4
+
+    (4) declaracao_externa -> declaracao_tipo .
+
+    TYPE            reduce using rule 4 (declaracao_externa -> declaracao_tipo .)
+    FUNCTION        reduce using rule 4 (declaracao_externa -> declaracao_tipo .)
+    VAR             reduce using rule 4 (declaracao_externa -> declaracao_tipo .)
+    $end            reduce using rule 4 (declaracao_externa -> declaracao_tipo .)
+
+
+state 5
+
+    (5) declaracao_externa -> declaracao_funcao .
+
+    TYPE            reduce using rule 5 (declaracao_externa -> declaracao_funcao .)
+    FUNCTION        reduce using rule 5 (declaracao_externa -> declaracao_funcao .)
+    VAR             reduce using rule 5 (declaracao_externa -> declaracao_funcao .)
+    $end            reduce using rule 5 (declaracao_externa -> declaracao_funcao .)
+
+
+state 6
+
+    (6) declaracao_externa -> declaracao_variavel .
+
+    TYPE            reduce using rule 6 (declaracao_externa -> declaracao_variavel .)
+    FUNCTION        reduce using rule 6 (declaracao_externa -> declaracao_variavel .)
+    VAR             reduce using rule 6 (declaracao_externa -> declaracao_variavel .)
+    $end            reduce using rule 6 (declaracao_externa -> declaracao_variavel .)
+
+
+state 7
+
+    (12) declaracao_tipo -> TYPE . IDD EQUALS ARRAY LEFT_SQUARE NUMERAL RIGHT_SQUARE OF tipo
+    (13) declaracao_tipo -> TYPE . IDD EQUALS STRUCT LEFT_BRACES declaracao_campos RIGHT_BRACES
+    (14) declaracao_tipo -> TYPE . IDD EQUALS tipo
+
+    IDD             shift and go to state 11
+
+
+state 8
+
+    (17) declaracao_funcao -> FUNCTION . IDD LEFT_PARENTHESIS lista_parametros RIGHT_PARENTHESIS COLON tipo bloco
+
+    IDD             shift and go to state 12
+
+
+state 9
+
+    (25) declaracao_variavel -> VAR . lista_identificadores COLON tipo SEMI_COLON
+    (26) lista_identificadores -> . lista_identificadores COMMA IDD
+    (27) lista_identificadores -> . IDD
+
+    IDD             shift and go to state 14
+
+    lista_identificadores          shift and go to state 13
+
+state 10
+
+    (3) lista_declaracoes_externas -> lista_declaracoes_externas declaracao_externa .
+
+    TYPE            reduce using rule 3 (lista_declaracoes_externas -> lista_declaracoes_externas declaracao_externa .)
+    FUNCTION        reduce using rule 3 (lista_declaracoes_externas -> lista_declaracoes_externas declaracao_externa .)
+    VAR             reduce using rule 3 (lista_declaracoes_externas -> lista_declaracoes_externas declaracao_externa .)
+    $end            reduce using rule 3 (lista_declaracoes_externas -> lista_declaracoes_externas declaracao_externa .)
+
+
+state 11
+
+    (12) declaracao_tipo -> TYPE IDD . EQUALS ARRAY LEFT_SQUARE NUMERAL RIGHT_SQUARE OF tipo
+    (13) declaracao_tipo -> TYPE IDD . EQUALS STRUCT LEFT_BRACES declaracao_campos RIGHT_BRACES
+    (14) declaracao_tipo -> TYPE IDD . EQUALS tipo
+
+    EQUALS          shift and go to state 15
+
+
+state 12
+
+    (17) declaracao_funcao -> FUNCTION IDD . LEFT_PARENTHESIS lista_parametros RIGHT_PARENTHESIS COLON tipo bloco
+
+    LEFT_PARENTHESIS shift and go to state 16
+
+
+state 13
+
+    (25) declaracao_variavel -> VAR lista_identificadores . COLON tipo SEMI_COLON
+    (26) lista_identificadores -> lista_identificadores . COMMA IDD
+
+    COLON           shift and go to state 17
+    COMMA           shift and go to state 18
+
+
+state 14
+
+    (27) lista_identificadores -> IDD .
+
+    COLON           reduce using rule 27 (lista_identificadores -> IDD .)
+    COMMA           reduce using rule 27 (lista_identificadores -> IDD .)
+
+
+state 15
+
+    (12) declaracao_tipo -> TYPE IDD EQUALS . ARRAY LEFT_SQUARE NUMERAL RIGHT_SQUARE OF tipo
+    (13) declaracao_tipo -> TYPE IDD EQUALS . STRUCT LEFT_BRACES declaracao_campos RIGHT_BRACES
+    (14) declaracao_tipo -> TYPE IDD EQUALS . tipo
+    (7) tipo -> . INTEGER
+    (8) tipo -> . CHAR
+    (9) tipo -> . BOOLEAN
+    (10) tipo -> . STRING
+    (11) tipo -> . IDU
+
+    ARRAY           shift and go to state 19
+    STRUCT          shift and go to state 21
+    INTEGER         shift and go to state 22
+    CHAR            shift and go to state 23
+    BOOLEAN         shift and go to state 24
+    STRING          shift and go to state 25
+    IDU             shift and go to state 26
+
+    tipo                           shift and go to state 20
+
+state 16
+
+    (17) declaracao_funcao -> FUNCTION IDD LEFT_PARENTHESIS . lista_parametros RIGHT_PARENTHESIS COLON tipo bloco
+    (18) lista_parametros -> . lista_parametros COMMA IDD COLON tipo
+    (19) lista_parametros -> . IDD COLON tipo
+
+    IDD             shift and go to state 27
+
+    lista_parametros               shift and go to state 28
+
+state 17
+
+    (25) declaracao_variavel -> VAR lista_identificadores COLON . tipo SEMI_COLON
+    (7) tipo -> . INTEGER
+    (8) tipo -> . CHAR
+    (9) tipo -> . BOOLEAN
+    (10) tipo -> . STRING
+    (11) tipo -> . IDU
+
+    INTEGER         shift and go to state 22
+    CHAR            shift and go to state 23
+    BOOLEAN         shift and go to state 24
+    STRING          shift and go to state 25
+    IDU             shift and go to state 26
+
+    tipo                           shift and go to state 29
+
+state 18
+
+    (26) lista_identificadores -> lista_identificadores COMMA . IDD
+
+    IDD             shift and go to state 30
+
+
+state 19
+
+    (12) declaracao_tipo -> TYPE IDD EQUALS ARRAY . LEFT_SQUARE NUMERAL RIGHT_SQUARE OF tipo
+
+    LEFT_SQUARE     shift and go to state 31
+
+
+state 20
+
+    (14) declaracao_tipo -> TYPE IDD EQUALS tipo .
+
+    TYPE            reduce using rule 14 (declaracao_tipo -> TYPE IDD EQUALS tipo .)
+    FUNCTION        reduce using rule 14 (declaracao_tipo -> TYPE IDD EQUALS tipo .)
+    VAR             reduce using rule 14 (declaracao_tipo -> TYPE IDD EQUALS tipo .)
+    $end            reduce using rule 14 (declaracao_tipo -> TYPE IDD EQUALS tipo .)
+
+
+state 21
+
+    (13) declaracao_tipo -> TYPE IDD EQUALS STRUCT . LEFT_BRACES declaracao_campos RIGHT_BRACES
+
+    LEFT_BRACES     shift and go to state 32
+
+
+state 22
+
+    (7) tipo -> INTEGER .
+
+    TYPE            reduce using rule 7 (tipo -> INTEGER .)
+    FUNCTION        reduce using rule 7 (tipo -> INTEGER .)
+    VAR             reduce using rule 7 (tipo -> INTEGER .)
+    $end            reduce using rule 7 (tipo -> INTEGER .)
+    SEMI_COLON      reduce using rule 7 (tipo -> INTEGER .)
+    RIGHT_PARENTHESIS reduce using rule 7 (tipo -> INTEGER .)
+    COMMA           reduce using rule 7 (tipo -> INTEGER .)
+    LEFT_BRACES     reduce using rule 7 (tipo -> INTEGER .)
+    RIGHT_BRACES    reduce using rule 7 (tipo -> INTEGER .)
+
+
+state 23
+
+    (8) tipo -> CHAR .
+
+    TYPE            reduce using rule 8 (tipo -> CHAR .)
+    FUNCTION        reduce using rule 8 (tipo -> CHAR .)
+    VAR             reduce using rule 8 (tipo -> CHAR .)
+    $end            reduce using rule 8 (tipo -> CHAR .)
+    SEMI_COLON      reduce using rule 8 (tipo -> CHAR .)
+    RIGHT_PARENTHESIS reduce using rule 8 (tipo -> CHAR .)
+    COMMA           reduce using rule 8 (tipo -> CHAR .)
+    LEFT_BRACES     reduce using rule 8 (tipo -> CHAR .)
+    RIGHT_BRACES    reduce using rule 8 (tipo -> CHAR .)
+
+
+state 24
+
+    (9) tipo -> BOOLEAN .
+
+    TYPE            reduce using rule 9 (tipo -> BOOLEAN .)
+    FUNCTION        reduce using rule 9 (tipo -> BOOLEAN .)
+    VAR             reduce using rule 9 (tipo -> BOOLEAN .)
+    $end            reduce using rule 9 (tipo -> BOOLEAN .)
+    SEMI_COLON      reduce using rule 9 (tipo -> BOOLEAN .)
+    RIGHT_PARENTHESIS reduce using rule 9 (tipo -> BOOLEAN .)
+    COMMA           reduce using rule 9 (tipo -> BOOLEAN .)
+    LEFT_BRACES     reduce using rule 9 (tipo -> BOOLEAN .)
+    RIGHT_BRACES    reduce using rule 9 (tipo -> BOOLEAN .)
+
+
+state 25
+
+    (10) tipo -> STRING .
+
+    TYPE            reduce using rule 10 (tipo -> STRING .)
+    FUNCTION        reduce using rule 10 (tipo -> STRING .)
+    VAR             reduce using rule 10 (tipo -> STRING .)
+    $end            reduce using rule 10 (tipo -> STRING .)
+    SEMI_COLON      reduce using rule 10 (tipo -> STRING .)
+    RIGHT_PARENTHESIS reduce using rule 10 (tipo -> STRING .)
+    COMMA           reduce using rule 10 (tipo -> STRING .)
+    LEFT_BRACES     reduce using rule 10 (tipo -> STRING .)
+    RIGHT_BRACES    reduce using rule 10 (tipo -> STRING .)
+
+
+state 26
+
+    (11) tipo -> IDU .
+
+    TYPE            reduce using rule 11 (tipo -> IDU .)
+    FUNCTION        reduce using rule 11 (tipo -> IDU .)
+    VAR             reduce using rule 11 (tipo -> IDU .)
+    $end            reduce using rule 11 (tipo -> IDU .)
+    SEMI_COLON      reduce using rule 11 (tipo -> IDU .)
+    RIGHT_PARENTHESIS reduce using rule 11 (tipo -> IDU .)
+    COMMA           reduce using rule 11 (tipo -> IDU .)
+    LEFT_BRACES     reduce using rule 11 (tipo -> IDU .)
+    RIGHT_BRACES    reduce using rule 11 (tipo -> IDU .)
+
+
+state 27
+
+    (19) lista_parametros -> IDD . COLON tipo
+
+    COLON           shift and go to state 33
+
+
+state 28
+
+    (17) declaracao_funcao -> FUNCTION IDD LEFT_PARENTHESIS lista_parametros . RIGHT_PARENTHESIS COLON tipo bloco
+    (18) lista_parametros -> lista_parametros . COMMA IDD COLON tipo
+
+    RIGHT_PARENTHESIS shift and go to state 34
+    COMMA           shift and go to state 35
+
+
+state 29
+
+    (25) declaracao_variavel -> VAR lista_identificadores COLON tipo . SEMI_COLON
+
+    SEMI_COLON      shift and go to state 36
+
+
+state 30
+
+    (26) lista_identificadores -> lista_identificadores COMMA IDD .
+
+    COLON           reduce using rule 26 (lista_identificadores -> lista_identificadores COMMA IDD .)
+    COMMA           reduce using rule 26 (lista_identificadores -> lista_identificadores COMMA IDD .)
+
+
+state 31
+
+    (12) declaracao_tipo -> TYPE IDD EQUALS ARRAY LEFT_SQUARE . NUMERAL RIGHT_SQUARE OF tipo
+
+    NUMERAL         shift and go to state 37
+
+
+state 32
+
+    (13) declaracao_tipo -> TYPE IDD EQUALS STRUCT LEFT_BRACES . declaracao_campos RIGHT_BRACES
+    (15) declaracao_campos -> . declaracao_campos SEMI_COLON lista_identificadores COLON tipo
+    (16) declaracao_campos -> . lista_identificadores COLON tipo
+    (26) lista_identificadores -> . lista_identificadores COMMA IDD
+    (27) lista_identificadores -> . IDD
+
+    IDD             shift and go to state 14
+
+    declaracao_campos              shift and go to state 38
+    lista_identificadores          shift and go to state 39
+
+state 33
+
+    (19) lista_parametros -> IDD COLON . tipo
+    (7) tipo -> . INTEGER
+    (8) tipo -> . CHAR
+    (9) tipo -> . BOOLEAN
+    (10) tipo -> . STRING
+    (11) tipo -> . IDU
+
+    INTEGER         shift and go to state 22
+    CHAR            shift and go to state 23
+    BOOLEAN         shift and go to state 24
+    STRING          shift and go to state 25
+    IDU             shift and go to state 26
+
+    tipo                           shift and go to state 40
+
+state 34
+
+    (17) declaracao_funcao -> FUNCTION IDD LEFT_PARENTHESIS lista_parametros RIGHT_PARENTHESIS . COLON tipo bloco
+
+    COLON           shift and go to state 41
+
+
+state 35
+
+    (18) lista_parametros -> lista_parametros COMMA . IDD COLON tipo
+
+    IDD             shift and go to state 42
+
+
+state 36
+
+    (25) declaracao_variavel -> VAR lista_identificadores COLON tipo SEMI_COLON .
+
+    TYPE            reduce using rule 25 (declaracao_variavel -> VAR lista_identificadores COLON tipo SEMI_COLON .)
+    FUNCTION        reduce using rule 25 (declaracao_variavel -> VAR lista_identificadores COLON tipo SEMI_COLON .)
+    VAR             reduce using rule 25 (declaracao_variavel -> VAR lista_identificadores COLON tipo SEMI_COLON .)
+    $end            reduce using rule 25 (declaracao_variavel -> VAR lista_identificadores COLON tipo SEMI_COLON .)
+    IF              reduce using rule 25 (declaracao_variavel -> VAR lista_identificadores COLON tipo SEMI_COLON .)
+    WHILE           reduce using rule 25 (declaracao_variavel -> VAR lista_identificadores COLON tipo SEMI_COLON .)
+    DO              reduce using rule 25 (declaracao_variavel -> VAR lista_identificadores COLON tipo SEMI_COLON .)
+    BREAK           reduce using rule 25 (declaracao_variavel -> VAR lista_identificadores COLON tipo SEMI_COLON .)
+    CONTINUE        reduce using rule 25 (declaracao_variavel -> VAR lista_identificadores COLON tipo SEMI_COLON .)
+    LEFT_BRACES     reduce using rule 25 (declaracao_variavel -> VAR lista_identificadores COLON tipo SEMI_COLON .)
+    IDU             reduce using rule 25 (declaracao_variavel -> VAR lista_identificadores COLON tipo SEMI_COLON .)
+
+
+state 37
+
+    (12) declaracao_tipo -> TYPE IDD EQUALS ARRAY LEFT_SQUARE NUMERAL . RIGHT_SQUARE OF tipo
+
+    RIGHT_SQUARE    shift and go to state 43
+
+
+state 38
+
+    (13) declaracao_tipo -> TYPE IDD EQUALS STRUCT LEFT_BRACES declaracao_campos . RIGHT_BRACES
+    (15) declaracao_campos -> declaracao_campos . SEMI_COLON lista_identificadores COLON tipo
+
+    RIGHT_BRACES    shift and go to state 44
+    SEMI_COLON      shift and go to state 45
+
+
+state 39
+
+    (16) declaracao_campos -> lista_identificadores . COLON tipo
+    (26) lista_identificadores -> lista_identificadores . COMMA IDD
+
+    COLON           shift and go to state 46
+    COMMA           shift and go to state 18
+
+
+state 40
+
+    (19) lista_parametros -> IDD COLON tipo .
+
+    RIGHT_PARENTHESIS reduce using rule 19 (lista_parametros -> IDD COLON tipo .)
+    COMMA           reduce using rule 19 (lista_parametros -> IDD COLON tipo .)
+
+
+state 41
+
+    (17) declaracao_funcao -> FUNCTION IDD LEFT_PARENTHESIS lista_parametros RIGHT_PARENTHESIS COLON . tipo bloco
+    (7) tipo -> . INTEGER
+    (8) tipo -> . CHAR
+    (9) tipo -> . BOOLEAN
+    (10) tipo -> . STRING
+    (11) tipo -> . IDU
+
+    INTEGER         shift and go to state 22
+    CHAR            shift and go to state 23
+    BOOLEAN         shift and go to state 24
+    STRING          shift and go to state 25
+    IDU             shift and go to state 26
+
+    tipo                           shift and go to state 47
+
+state 42
+
+    (18) lista_parametros -> lista_parametros COMMA IDD . COLON tipo
+
+    COLON           shift and go to state 48
+
+
+state 43
+
+    (12) declaracao_tipo -> TYPE IDD EQUALS ARRAY LEFT_SQUARE NUMERAL RIGHT_SQUARE . OF tipo
+
+    OF              shift and go to state 49
+
+
+state 44
+
+    (13) declaracao_tipo -> TYPE IDD EQUALS STRUCT LEFT_BRACES declaracao_campos RIGHT_BRACES .
+
+    TYPE            reduce using rule 13 (declaracao_tipo -> TYPE IDD EQUALS STRUCT LEFT_BRACES declaracao_campos RIGHT_BRACES .)
+    FUNCTION        reduce using rule 13 (declaracao_tipo -> TYPE IDD EQUALS STRUCT LEFT_BRACES declaracao_campos RIGHT_BRACES .)
+    VAR             reduce using rule 13 (declaracao_tipo -> TYPE IDD EQUALS STRUCT LEFT_BRACES declaracao_campos RIGHT_BRACES .)
+    $end            reduce using rule 13 (declaracao_tipo -> TYPE IDD EQUALS STRUCT LEFT_BRACES declaracao_campos RIGHT_BRACES .)
+
+
+state 45
+
+    (15) declaracao_campos -> declaracao_campos SEMI_COLON . lista_identificadores COLON tipo
+    (26) lista_identificadores -> . lista_identificadores COMMA IDD
+    (27) lista_identificadores -> . IDD
+
+    IDD             shift and go to state 14
+
+    lista_identificadores          shift and go to state 50
+
+state 46
+
+    (16) declaracao_campos -> lista_identificadores COLON . tipo
+    (7) tipo -> . INTEGER
+    (8) tipo -> . CHAR
+    (9) tipo -> . BOOLEAN
+    (10) tipo -> . STRING
+    (11) tipo -> . IDU
+
+    INTEGER         shift and go to state 22
+    CHAR            shift and go to state 23
+    BOOLEAN         shift and go to state 24
+    STRING          shift and go to state 25
+    IDU             shift and go to state 26
+
+    tipo                           shift and go to state 51
+
+state 47
+
+    (17) declaracao_funcao -> FUNCTION IDD LEFT_PARENTHESIS lista_parametros RIGHT_PARENTHESIS COLON tipo . bloco
+    (20) bloco -> . LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES
+
+    LEFT_BRACES     shift and go to state 53
+
+    bloco                          shift and go to state 52
+
+state 48
+
+    (18) lista_parametros -> lista_parametros COMMA IDD COLON . tipo
+    (7) tipo -> . INTEGER
+    (8) tipo -> . CHAR
+    (9) tipo -> . BOOLEAN
+    (10) tipo -> . STRING
+    (11) tipo -> . IDU
+
+    INTEGER         shift and go to state 22
+    CHAR            shift and go to state 23
+    BOOLEAN         shift and go to state 24
+    STRING          shift and go to state 25
+    IDU             shift and go to state 26
+
+    tipo                           shift and go to state 54
+
+state 49
+
+    (12) declaracao_tipo -> TYPE IDD EQUALS ARRAY LEFT_SQUARE NUMERAL RIGHT_SQUARE OF . tipo
+    (7) tipo -> . INTEGER
+    (8) tipo -> . CHAR
+    (9) tipo -> . BOOLEAN
+    (10) tipo -> . STRING
+    (11) tipo -> . IDU
+
+    INTEGER         shift and go to state 22
+    CHAR            shift and go to state 23
+    BOOLEAN         shift and go to state 24
+    STRING          shift and go to state 25
+    IDU             shift and go to state 26
+
+    tipo                           shift and go to state 55
+
+state 50
+
+    (15) declaracao_campos -> declaracao_campos SEMI_COLON lista_identificadores . COLON tipo
+    (26) lista_identificadores -> lista_identificadores . COMMA IDD
+
+    COLON           shift and go to state 56
+    COMMA           shift and go to state 18
+
+
+state 51
+
+    (16) declaracao_campos -> lista_identificadores COLON tipo .
+
+    RIGHT_BRACES    reduce using rule 16 (declaracao_campos -> lista_identificadores COLON tipo .)
+    SEMI_COLON      reduce using rule 16 (declaracao_campos -> lista_identificadores COLON tipo .)
+
+
+state 52
+
+    (17) declaracao_funcao -> FUNCTION IDD LEFT_PARENTHESIS lista_parametros RIGHT_PARENTHESIS COLON tipo bloco .
+
+    TYPE            reduce using rule 17 (declaracao_funcao -> FUNCTION IDD LEFT_PARENTHESIS lista_parametros RIGHT_PARENTHESIS COLON tipo bloco .)
+    FUNCTION        reduce using rule 17 (declaracao_funcao -> FUNCTION IDD LEFT_PARENTHESIS lista_parametros RIGHT_PARENTHESIS COLON tipo bloco .)
+    VAR             reduce using rule 17 (declaracao_funcao -> FUNCTION IDD LEFT_PARENTHESIS lista_parametros RIGHT_PARENTHESIS COLON tipo bloco .)
+    $end            reduce using rule 17 (declaracao_funcao -> FUNCTION IDD LEFT_PARENTHESIS lista_parametros RIGHT_PARENTHESIS COLON tipo bloco .)
+
+
+state 53
+
+    (20) bloco -> LEFT_BRACES . lista_declaracao_variaveis lista_comandos RIGHT_BRACES
+    (21) lista_declaracao_variaveis -> . lista_declaracao_variaveis declaracao_variavel
+    (22) lista_declaracao_variaveis -> . declaracao_variavel
+    (25) declaracao_variavel -> . VAR lista_identificadores COLON tipo SEMI_COLON
+
+    VAR             shift and go to state 9
+
+    lista_declaracao_variaveis     shift and go to state 57
+    declaracao_variavel            shift and go to state 58
+
+state 54
+
+    (18) lista_parametros -> lista_parametros COMMA IDD COLON tipo .
+
+    RIGHT_PARENTHESIS reduce using rule 18 (lista_parametros -> lista_parametros COMMA IDD COLON tipo .)
+    COMMA           reduce using rule 18 (lista_parametros -> lista_parametros COMMA IDD COLON tipo .)
+
+
+state 55
+
+    (12) declaracao_tipo -> TYPE IDD EQUALS ARRAY LEFT_SQUARE NUMERAL RIGHT_SQUARE OF tipo .
+
+    TYPE            reduce using rule 12 (declaracao_tipo -> TYPE IDD EQUALS ARRAY LEFT_SQUARE NUMERAL RIGHT_SQUARE OF tipo .)
+    FUNCTION        reduce using rule 12 (declaracao_tipo -> TYPE IDD EQUALS ARRAY LEFT_SQUARE NUMERAL RIGHT_SQUARE OF tipo .)
+    VAR             reduce using rule 12 (declaracao_tipo -> TYPE IDD EQUALS ARRAY LEFT_SQUARE NUMERAL RIGHT_SQUARE OF tipo .)
+    $end            reduce using rule 12 (declaracao_tipo -> TYPE IDD EQUALS ARRAY LEFT_SQUARE NUMERAL RIGHT_SQUARE OF tipo .)
+
+
+state 56
+
+    (15) declaracao_campos -> declaracao_campos SEMI_COLON lista_identificadores COLON . tipo
+    (7) tipo -> . INTEGER
+    (8) tipo -> . CHAR
+    (9) tipo -> . BOOLEAN
+    (10) tipo -> . STRING
+    (11) tipo -> . IDU
+
+    INTEGER         shift and go to state 22
+    CHAR            shift and go to state 23
+    BOOLEAN         shift and go to state 24
+    STRING          shift and go to state 25
+    IDU             shift and go to state 26
+
+    tipo                           shift and go to state 59
+
+state 57
+
+    (20) bloco -> LEFT_BRACES lista_declaracao_variaveis . lista_comandos RIGHT_BRACES
+    (21) lista_declaracao_variaveis -> lista_declaracao_variaveis . declaracao_variavel
+    (23) lista_comandos -> . lista_comandos comando
+    (24) lista_comandos -> . comando
+    (25) declaracao_variavel -> . VAR lista_identificadores COLON tipo SEMI_COLON
+    (28) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    (29) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE comando
+    (30) comando -> . WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    (31) comando -> . DO comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
+    (32) comando -> . bloco
+    (33) comando -> . valor_esquerdo EQUALS expressao SEMI_COLON
+    (34) comando -> . BREAK SEMI_COLON
+    (35) comando -> . CONTINUE SEMI_COLON
+    (20) bloco -> . LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    VAR             shift and go to state 9
+    IF              shift and go to state 63
+    WHILE           shift and go to state 64
+    DO              shift and go to state 65
+    BREAK           shift and go to state 68
+    CONTINUE        shift and go to state 69
+    LEFT_BRACES     shift and go to state 53
+    IDU             shift and go to state 70
+
+    lista_comandos                 shift and go to state 60
+    declaracao_variavel            shift and go to state 61
+    comando                        shift and go to state 62
+    bloco                          shift and go to state 66
+    valor_esquerdo                 shift and go to state 67
+
+state 58
+
+    (22) lista_declaracao_variaveis -> declaracao_variavel .
+
+    VAR             reduce using rule 22 (lista_declaracao_variaveis -> declaracao_variavel .)
+    IF              reduce using rule 22 (lista_declaracao_variaveis -> declaracao_variavel .)
+    WHILE           reduce using rule 22 (lista_declaracao_variaveis -> declaracao_variavel .)
+    DO              reduce using rule 22 (lista_declaracao_variaveis -> declaracao_variavel .)
+    BREAK           reduce using rule 22 (lista_declaracao_variaveis -> declaracao_variavel .)
+    CONTINUE        reduce using rule 22 (lista_declaracao_variaveis -> declaracao_variavel .)
+    LEFT_BRACES     reduce using rule 22 (lista_declaracao_variaveis -> declaracao_variavel .)
+    IDU             reduce using rule 22 (lista_declaracao_variaveis -> declaracao_variavel .)
+
+
+state 59
+
+    (15) declaracao_campos -> declaracao_campos SEMI_COLON lista_identificadores COLON tipo .
+
+    RIGHT_BRACES    reduce using rule 15 (declaracao_campos -> declaracao_campos SEMI_COLON lista_identificadores COLON tipo .)
+    SEMI_COLON      reduce using rule 15 (declaracao_campos -> declaracao_campos SEMI_COLON lista_identificadores COLON tipo .)
+
+
+state 60
+
+    (20) bloco -> LEFT_BRACES lista_declaracao_variaveis lista_comandos . RIGHT_BRACES
+    (23) lista_comandos -> lista_comandos . comando
+    (28) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    (29) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE comando
+    (30) comando -> . WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    (31) comando -> . DO comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
+    (32) comando -> . bloco
+    (33) comando -> . valor_esquerdo EQUALS expressao SEMI_COLON
+    (34) comando -> . BREAK SEMI_COLON
+    (35) comando -> . CONTINUE SEMI_COLON
+    (20) bloco -> . LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    RIGHT_BRACES    shift and go to state 71
+    IF              shift and go to state 63
+    WHILE           shift and go to state 64
+    DO              shift and go to state 65
+    BREAK           shift and go to state 68
+    CONTINUE        shift and go to state 69
+    LEFT_BRACES     shift and go to state 53
+    IDU             shift and go to state 70
+
+    comando                        shift and go to state 72
+    bloco                          shift and go to state 66
+    valor_esquerdo                 shift and go to state 67
+
+state 61
+
+    (21) lista_declaracao_variaveis -> lista_declaracao_variaveis declaracao_variavel .
+
+    VAR             reduce using rule 21 (lista_declaracao_variaveis -> lista_declaracao_variaveis declaracao_variavel .)
+    IF              reduce using rule 21 (lista_declaracao_variaveis -> lista_declaracao_variaveis declaracao_variavel .)
+    WHILE           reduce using rule 21 (lista_declaracao_variaveis -> lista_declaracao_variaveis declaracao_variavel .)
+    DO              reduce using rule 21 (lista_declaracao_variaveis -> lista_declaracao_variaveis declaracao_variavel .)
+    BREAK           reduce using rule 21 (lista_declaracao_variaveis -> lista_declaracao_variaveis declaracao_variavel .)
+    CONTINUE        reduce using rule 21 (lista_declaracao_variaveis -> lista_declaracao_variaveis declaracao_variavel .)
+    LEFT_BRACES     reduce using rule 21 (lista_declaracao_variaveis -> lista_declaracao_variaveis declaracao_variavel .)
+    IDU             reduce using rule 21 (lista_declaracao_variaveis -> lista_declaracao_variaveis declaracao_variavel .)
+
+
+state 62
+
+    (24) lista_comandos -> comando .
+
+    RIGHT_BRACES    reduce using rule 24 (lista_comandos -> comando .)
+    IF              reduce using rule 24 (lista_comandos -> comando .)
+    WHILE           reduce using rule 24 (lista_comandos -> comando .)
+    DO              reduce using rule 24 (lista_comandos -> comando .)
+    BREAK           reduce using rule 24 (lista_comandos -> comando .)
+    CONTINUE        reduce using rule 24 (lista_comandos -> comando .)
+    LEFT_BRACES     reduce using rule 24 (lista_comandos -> comando .)
+    IDU             reduce using rule 24 (lista_comandos -> comando .)
+
+
+state 63
+
+    (28) comando -> IF . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    (29) comando -> IF . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE comando
+
+    LEFT_PARENTHESIS shift and go to state 73
+
+
+state 64
+
+    (30) comando -> WHILE . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+
+    LEFT_PARENTHESIS shift and go to state 74
+
+
+state 65
+
+    (31) comando -> DO . comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
+    (28) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    (29) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE comando
+    (30) comando -> . WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    (31) comando -> . DO comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
+    (32) comando -> . bloco
+    (33) comando -> . valor_esquerdo EQUALS expressao SEMI_COLON
+    (34) comando -> . BREAK SEMI_COLON
+    (35) comando -> . CONTINUE SEMI_COLON
+    (20) bloco -> . LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    IF              shift and go to state 63
+    WHILE           shift and go to state 64
+    DO              shift and go to state 65
+    BREAK           shift and go to state 68
+    CONTINUE        shift and go to state 69
+    LEFT_BRACES     shift and go to state 53
+    IDU             shift and go to state 70
+
+    comando                        shift and go to state 75
+    bloco                          shift and go to state 66
+    valor_esquerdo                 shift and go to state 67
+
+state 66
+
+    (32) comando -> bloco .
+
+    RIGHT_BRACES    reduce using rule 32 (comando -> bloco .)
+    IF              reduce using rule 32 (comando -> bloco .)
+    WHILE           reduce using rule 32 (comando -> bloco .)
+    DO              reduce using rule 32 (comando -> bloco .)
+    BREAK           reduce using rule 32 (comando -> bloco .)
+    CONTINUE        reduce using rule 32 (comando -> bloco .)
+    LEFT_BRACES     reduce using rule 32 (comando -> bloco .)
+    IDU             reduce using rule 32 (comando -> bloco .)
+    ELSE            reduce using rule 32 (comando -> bloco .)
+
+
+state 67
+
+    (33) comando -> valor_esquerdo . EQUALS expressao SEMI_COLON
+    (68) valor_esquerdo -> valor_esquerdo . DOT IDU
+    (69) valor_esquerdo -> valor_esquerdo . LEFT_SQUARE expressao RIGHT_SQUARE
+
+    EQUALS          shift and go to state 76
+    DOT             shift and go to state 77
+    LEFT_SQUARE     shift and go to state 78
+
+
+state 68
+
+    (34) comando -> BREAK . SEMI_COLON
+
+    SEMI_COLON      shift and go to state 79
+
+
+state 69
+
+    (35) comando -> CONTINUE . SEMI_COLON
+
+    SEMI_COLON      shift and go to state 80
+
+
+state 70
+
+    (70) valor_esquerdo -> IDU .
+
+    EQUALS          reduce using rule 70 (valor_esquerdo -> IDU .)
+    DOT             reduce using rule 70 (valor_esquerdo -> IDU .)
+    LEFT_SQUARE     reduce using rule 70 (valor_esquerdo -> IDU .)
+    TIMES           reduce using rule 70 (valor_esquerdo -> IDU .)
+    DIVIDE          reduce using rule 70 (valor_esquerdo -> IDU .)
+    PLUS            reduce using rule 70 (valor_esquerdo -> IDU .)
+    MINUS           reduce using rule 70 (valor_esquerdo -> IDU .)
+    LESS_THAN       reduce using rule 70 (valor_esquerdo -> IDU .)
+    LESS_OR_EQUAL   reduce using rule 70 (valor_esquerdo -> IDU .)
+    GREATER_THAN    reduce using rule 70 (valor_esquerdo -> IDU .)
+    GREATER_OR_EQUAL reduce using rule 70 (valor_esquerdo -> IDU .)
+    EQUAL_EQUAL     reduce using rule 70 (valor_esquerdo -> IDU .)
+    NOT_EQUAL       reduce using rule 70 (valor_esquerdo -> IDU .)
+    RIGHT_PARENTHESIS reduce using rule 70 (valor_esquerdo -> IDU .)
+    AND             reduce using rule 70 (valor_esquerdo -> IDU .)
+    OR              reduce using rule 70 (valor_esquerdo -> IDU .)
+    SEMI_COLON      reduce using rule 70 (valor_esquerdo -> IDU .)
+    RIGHT_SQUARE    reduce using rule 70 (valor_esquerdo -> IDU .)
+    COMMA           reduce using rule 70 (valor_esquerdo -> IDU .)
+
+
+state 71
+
+    (20) bloco -> LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES .
+
+    TYPE            reduce using rule 20 (bloco -> LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES .)
+    FUNCTION        reduce using rule 20 (bloco -> LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES .)
+    VAR             reduce using rule 20 (bloco -> LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES .)
+    $end            reduce using rule 20 (bloco -> LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES .)
+    RIGHT_BRACES    reduce using rule 20 (bloco -> LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES .)
+    IF              reduce using rule 20 (bloco -> LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES .)
+    WHILE           reduce using rule 20 (bloco -> LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES .)
+    DO              reduce using rule 20 (bloco -> LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES .)
+    BREAK           reduce using rule 20 (bloco -> LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES .)
+    CONTINUE        reduce using rule 20 (bloco -> LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES .)
+    LEFT_BRACES     reduce using rule 20 (bloco -> LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES .)
+    IDU             reduce using rule 20 (bloco -> LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES .)
+    ELSE            reduce using rule 20 (bloco -> LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES .)
+
+
+state 72
+
+    (23) lista_comandos -> lista_comandos comando .
+
+    RIGHT_BRACES    reduce using rule 23 (lista_comandos -> lista_comandos comando .)
+    IF              reduce using rule 23 (lista_comandos -> lista_comandos comando .)
+    WHILE           reduce using rule 23 (lista_comandos -> lista_comandos comando .)
+    DO              reduce using rule 23 (lista_comandos -> lista_comandos comando .)
+    BREAK           reduce using rule 23 (lista_comandos -> lista_comandos comando .)
+    CONTINUE        reduce using rule 23 (lista_comandos -> lista_comandos comando .)
+    LEFT_BRACES     reduce using rule 23 (lista_comandos -> lista_comandos comando .)
+    IDU             reduce using rule 23 (lista_comandos -> lista_comandos comando .)
+
+
+state 73
+
+    (28) comando -> IF LEFT_PARENTHESIS . expressao RIGHT_PARENTHESIS comando
+    (29) comando -> IF LEFT_PARENTHESIS . expressao RIGHT_PARENTHESIS comando ELSE comando
+    (36) expressao -> . expressao AND expressao_l
+    (37) expressao -> . expressao OR expressao_l
+    (38) expressao -> . expressao_l
+    (39) expressao_l -> . expressao_l LESS_THAN expressao_r
+    (40) expressao_l -> . expressao_l LESS_OR_EQUAL expressao_r
+    (41) expressao_l -> . expressao_l GREATER_THAN expressao_r
+    (42) expressao_l -> . expressao_l GREATER_OR_EQUAL expressao_r
+    (43) expressao_l -> . expressao_l EQUAL_EQUAL expressao_r
+    (44) expressao_l -> . expressao_l NOT_EQUAL expressao_r
+    (45) expressao_l -> . expressao_r
+    (46) expressao_r -> . expressao_r PLUS expressao_y
+    (47) expressao_r -> . expressao_r MINUS expressao_y
+    (48) expressao_r -> . expressao_y
+    (49) expressao_y -> . expressao_y TIMES expressao_f
+    (50) expressao_y -> . expressao_y DIVIDE expressao_f
+    (51) expressao_y -> . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    expressao                      shift and go to state 82
+    expressao_l                    shift and go to state 83
+    expressao_r                    shift and go to state 84
+    expressao_y                    shift and go to state 85
+    expressao_f                    shift and go to state 87
+    valor_esquerdo                 shift and go to state 88
+
+state 74
+
+    (30) comando -> WHILE LEFT_PARENTHESIS . expressao RIGHT_PARENTHESIS comando
+    (36) expressao -> . expressao AND expressao_l
+    (37) expressao -> . expressao OR expressao_l
+    (38) expressao -> . expressao_l
+    (39) expressao_l -> . expressao_l LESS_THAN expressao_r
+    (40) expressao_l -> . expressao_l LESS_OR_EQUAL expressao_r
+    (41) expressao_l -> . expressao_l GREATER_THAN expressao_r
+    (42) expressao_l -> . expressao_l GREATER_OR_EQUAL expressao_r
+    (43) expressao_l -> . expressao_l EQUAL_EQUAL expressao_r
+    (44) expressao_l -> . expressao_l NOT_EQUAL expressao_r
+    (45) expressao_l -> . expressao_r
+    (46) expressao_r -> . expressao_r PLUS expressao_y
+    (47) expressao_r -> . expressao_r MINUS expressao_y
+    (48) expressao_r -> . expressao_y
+    (49) expressao_y -> . expressao_y TIMES expressao_f
+    (50) expressao_y -> . expressao_y DIVIDE expressao_f
+    (51) expressao_y -> . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    expressao                      shift and go to state 98
+    expressao_l                    shift and go to state 83
+    expressao_r                    shift and go to state 84
+    expressao_y                    shift and go to state 85
+    expressao_f                    shift and go to state 87
+    valor_esquerdo                 shift and go to state 88
+
+state 75
+
+    (31) comando -> DO comando . WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
+
+    WHILE           shift and go to state 99
+
+
+state 76
+
+    (33) comando -> valor_esquerdo EQUALS . expressao SEMI_COLON
+    (36) expressao -> . expressao AND expressao_l
+    (37) expressao -> . expressao OR expressao_l
+    (38) expressao -> . expressao_l
+    (39) expressao_l -> . expressao_l LESS_THAN expressao_r
+    (40) expressao_l -> . expressao_l LESS_OR_EQUAL expressao_r
+    (41) expressao_l -> . expressao_l GREATER_THAN expressao_r
+    (42) expressao_l -> . expressao_l GREATER_OR_EQUAL expressao_r
+    (43) expressao_l -> . expressao_l EQUAL_EQUAL expressao_r
+    (44) expressao_l -> . expressao_l NOT_EQUAL expressao_r
+    (45) expressao_l -> . expressao_r
+    (46) expressao_r -> . expressao_r PLUS expressao_y
+    (47) expressao_r -> . expressao_r MINUS expressao_y
+    (48) expressao_r -> . expressao_y
+    (49) expressao_y -> . expressao_y TIMES expressao_f
+    (50) expressao_y -> . expressao_y DIVIDE expressao_f
+    (51) expressao_y -> . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    valor_esquerdo                 shift and go to state 88
+    expressao                      shift and go to state 100
+    expressao_l                    shift and go to state 83
+    expressao_r                    shift and go to state 84
+    expressao_y                    shift and go to state 85
+    expressao_f                    shift and go to state 87
+
+state 77
+
+    (68) valor_esquerdo -> valor_esquerdo DOT . IDU
+
+    IDU             shift and go to state 101
+
+
+state 78
+
+    (69) valor_esquerdo -> valor_esquerdo LEFT_SQUARE . expressao RIGHT_SQUARE
+    (36) expressao -> . expressao AND expressao_l
+    (37) expressao -> . expressao OR expressao_l
+    (38) expressao -> . expressao_l
+    (39) expressao_l -> . expressao_l LESS_THAN expressao_r
+    (40) expressao_l -> . expressao_l LESS_OR_EQUAL expressao_r
+    (41) expressao_l -> . expressao_l GREATER_THAN expressao_r
+    (42) expressao_l -> . expressao_l GREATER_OR_EQUAL expressao_r
+    (43) expressao_l -> . expressao_l EQUAL_EQUAL expressao_r
+    (44) expressao_l -> . expressao_l NOT_EQUAL expressao_r
+    (45) expressao_l -> . expressao_r
+    (46) expressao_r -> . expressao_r PLUS expressao_y
+    (47) expressao_r -> . expressao_r MINUS expressao_y
+    (48) expressao_r -> . expressao_y
+    (49) expressao_y -> . expressao_y TIMES expressao_f
+    (50) expressao_y -> . expressao_y DIVIDE expressao_f
+    (51) expressao_y -> . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    valor_esquerdo                 shift and go to state 88
+    expressao                      shift and go to state 102
+    expressao_l                    shift and go to state 83
+    expressao_r                    shift and go to state 84
+    expressao_y                    shift and go to state 85
+    expressao_f                    shift and go to state 87
+
+state 79
+
+    (34) comando -> BREAK SEMI_COLON .
+
+    RIGHT_BRACES    reduce using rule 34 (comando -> BREAK SEMI_COLON .)
+    IF              reduce using rule 34 (comando -> BREAK SEMI_COLON .)
+    WHILE           reduce using rule 34 (comando -> BREAK SEMI_COLON .)
+    DO              reduce using rule 34 (comando -> BREAK SEMI_COLON .)
+    BREAK           reduce using rule 34 (comando -> BREAK SEMI_COLON .)
+    CONTINUE        reduce using rule 34 (comando -> BREAK SEMI_COLON .)
+    LEFT_BRACES     reduce using rule 34 (comando -> BREAK SEMI_COLON .)
+    IDU             reduce using rule 34 (comando -> BREAK SEMI_COLON .)
+    ELSE            reduce using rule 34 (comando -> BREAK SEMI_COLON .)
+
+
+state 80
+
+    (35) comando -> CONTINUE SEMI_COLON .
+
+    RIGHT_BRACES    reduce using rule 35 (comando -> CONTINUE SEMI_COLON .)
+    IF              reduce using rule 35 (comando -> CONTINUE SEMI_COLON .)
+    WHILE           reduce using rule 35 (comando -> CONTINUE SEMI_COLON .)
+    DO              reduce using rule 35 (comando -> CONTINUE SEMI_COLON .)
+    BREAK           reduce using rule 35 (comando -> CONTINUE SEMI_COLON .)
+    CONTINUE        reduce using rule 35 (comando -> CONTINUE SEMI_COLON .)
+    LEFT_BRACES     reduce using rule 35 (comando -> CONTINUE SEMI_COLON .)
+    IDU             reduce using rule 35 (comando -> CONTINUE SEMI_COLON .)
+    ELSE            reduce using rule 35 (comando -> CONTINUE SEMI_COLON .)
+
+
+state 81
+
+    (57) expressao_f -> LEFT_PARENTHESIS . expressao RIGHT_PARENTHESIS
+    (36) expressao -> . expressao AND expressao_l
+    (37) expressao -> . expressao OR expressao_l
+    (38) expressao -> . expressao_l
+    (39) expressao_l -> . expressao_l LESS_THAN expressao_r
+    (40) expressao_l -> . expressao_l LESS_OR_EQUAL expressao_r
+    (41) expressao_l -> . expressao_l GREATER_THAN expressao_r
+    (42) expressao_l -> . expressao_l GREATER_OR_EQUAL expressao_r
+    (43) expressao_l -> . expressao_l EQUAL_EQUAL expressao_r
+    (44) expressao_l -> . expressao_l NOT_EQUAL expressao_r
+    (45) expressao_l -> . expressao_r
+    (46) expressao_r -> . expressao_r PLUS expressao_y
+    (47) expressao_r -> . expressao_r MINUS expressao_y
+    (48) expressao_r -> . expressao_y
+    (49) expressao_y -> . expressao_y TIMES expressao_f
+    (50) expressao_y -> . expressao_y DIVIDE expressao_f
+    (51) expressao_y -> . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    expressao                      shift and go to state 103
+    expressao_l                    shift and go to state 83
+    expressao_r                    shift and go to state 84
+    expressao_y                    shift and go to state 85
+    expressao_f                    shift and go to state 87
+    valor_esquerdo                 shift and go to state 88
+
+state 82
+
+    (28) comando -> IF LEFT_PARENTHESIS expressao . RIGHT_PARENTHESIS comando
+    (29) comando -> IF LEFT_PARENTHESIS expressao . RIGHT_PARENTHESIS comando ELSE comando
+    (36) expressao -> expressao . AND expressao_l
+    (37) expressao -> expressao . OR expressao_l
+
+    RIGHT_PARENTHESIS shift and go to state 104
+    AND             shift and go to state 105
+    OR              shift and go to state 106
+
+
+state 83
+
+    (38) expressao -> expressao_l .
+    (39) expressao_l -> expressao_l . LESS_THAN expressao_r
+    (40) expressao_l -> expressao_l . LESS_OR_EQUAL expressao_r
+    (41) expressao_l -> expressao_l . GREATER_THAN expressao_r
+    (42) expressao_l -> expressao_l . GREATER_OR_EQUAL expressao_r
+    (43) expressao_l -> expressao_l . EQUAL_EQUAL expressao_r
+    (44) expressao_l -> expressao_l . NOT_EQUAL expressao_r
+
+    RIGHT_PARENTHESIS reduce using rule 38 (expressao -> expressao_l .)
+    AND             reduce using rule 38 (expressao -> expressao_l .)
+    OR              reduce using rule 38 (expressao -> expressao_l .)
+    SEMI_COLON      reduce using rule 38 (expressao -> expressao_l .)
+    RIGHT_SQUARE    reduce using rule 38 (expressao -> expressao_l .)
+    COMMA           reduce using rule 38 (expressao -> expressao_l .)
+    LESS_THAN       shift and go to state 107
+    LESS_OR_EQUAL   shift and go to state 108
+    GREATER_THAN    shift and go to state 109
+    GREATER_OR_EQUAL shift and go to state 110
+    EQUAL_EQUAL     shift and go to state 111
+    NOT_EQUAL       shift and go to state 112
+
+
+state 84
+
+    (45) expressao_l -> expressao_r .
+    (46) expressao_r -> expressao_r . PLUS expressao_y
+    (47) expressao_r -> expressao_r . MINUS expressao_y
+
+    LESS_THAN       reduce using rule 45 (expressao_l -> expressao_r .)
+    LESS_OR_EQUAL   reduce using rule 45 (expressao_l -> expressao_r .)
+    GREATER_THAN    reduce using rule 45 (expressao_l -> expressao_r .)
+    GREATER_OR_EQUAL reduce using rule 45 (expressao_l -> expressao_r .)
+    EQUAL_EQUAL     reduce using rule 45 (expressao_l -> expressao_r .)
+    NOT_EQUAL       reduce using rule 45 (expressao_l -> expressao_r .)
+    RIGHT_PARENTHESIS reduce using rule 45 (expressao_l -> expressao_r .)
+    AND             reduce using rule 45 (expressao_l -> expressao_r .)
+    OR              reduce using rule 45 (expressao_l -> expressao_r .)
+    SEMI_COLON      reduce using rule 45 (expressao_l -> expressao_r .)
+    RIGHT_SQUARE    reduce using rule 45 (expressao_l -> expressao_r .)
+    COMMA           reduce using rule 45 (expressao_l -> expressao_r .)
+    PLUS            shift and go to state 113
+    MINUS           shift and go to state 114
+
+
+state 85
+
+    (48) expressao_r -> expressao_y .
+    (49) expressao_y -> expressao_y . TIMES expressao_f
+    (50) expressao_y -> expressao_y . DIVIDE expressao_f
+
+    PLUS            reduce using rule 48 (expressao_r -> expressao_y .)
+    MINUS           reduce using rule 48 (expressao_r -> expressao_y .)
+    LESS_THAN       reduce using rule 48 (expressao_r -> expressao_y .)
+    LESS_OR_EQUAL   reduce using rule 48 (expressao_r -> expressao_y .)
+    GREATER_THAN    reduce using rule 48 (expressao_r -> expressao_y .)
+    GREATER_OR_EQUAL reduce using rule 48 (expressao_r -> expressao_y .)
+    EQUAL_EQUAL     reduce using rule 48 (expressao_r -> expressao_y .)
+    NOT_EQUAL       reduce using rule 48 (expressao_r -> expressao_y .)
+    RIGHT_PARENTHESIS reduce using rule 48 (expressao_r -> expressao_y .)
+    AND             reduce using rule 48 (expressao_r -> expressao_y .)
+    OR              reduce using rule 48 (expressao_r -> expressao_y .)
+    SEMI_COLON      reduce using rule 48 (expressao_r -> expressao_y .)
+    RIGHT_SQUARE    reduce using rule 48 (expressao_r -> expressao_y .)
+    COMMA           reduce using rule 48 (expressao_r -> expressao_y .)
+    TIMES           shift and go to state 115
+    DIVIDE          shift and go to state 116
+
+
+state 86
+
+    (59) expressao_f -> MINUS . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    expressao_f                    shift and go to state 117
+    valor_esquerdo                 shift and go to state 88
+
+state 87
+
+    (51) expressao_y -> expressao_f .
+
+    TIMES           reduce using rule 51 (expressao_y -> expressao_f .)
+    DIVIDE          reduce using rule 51 (expressao_y -> expressao_f .)
+    PLUS            reduce using rule 51 (expressao_y -> expressao_f .)
+    MINUS           reduce using rule 51 (expressao_y -> expressao_f .)
+    LESS_THAN       reduce using rule 51 (expressao_y -> expressao_f .)
+    LESS_OR_EQUAL   reduce using rule 51 (expressao_y -> expressao_f .)
+    GREATER_THAN    reduce using rule 51 (expressao_y -> expressao_f .)
+    GREATER_OR_EQUAL reduce using rule 51 (expressao_y -> expressao_f .)
+    EQUAL_EQUAL     reduce using rule 51 (expressao_y -> expressao_f .)
+    NOT_EQUAL       reduce using rule 51 (expressao_y -> expressao_f .)
+    RIGHT_PARENTHESIS reduce using rule 51 (expressao_y -> expressao_f .)
+    AND             reduce using rule 51 (expressao_y -> expressao_f .)
+    OR              reduce using rule 51 (expressao_y -> expressao_f .)
+    SEMI_COLON      reduce using rule 51 (expressao_y -> expressao_f .)
+    RIGHT_SQUARE    reduce using rule 51 (expressao_y -> expressao_f .)
+    COMMA           reduce using rule 51 (expressao_y -> expressao_f .)
+
+
+state 88
+
+    (52) expressao_f -> valor_esquerdo .
+    (55) expressao_f -> valor_esquerdo . PLUS_PLUS
+    (56) expressao_f -> valor_esquerdo . MINUS_MINUS
+    (68) valor_esquerdo -> valor_esquerdo . DOT IDU
+    (69) valor_esquerdo -> valor_esquerdo . LEFT_SQUARE expressao RIGHT_SQUARE
+
+    TIMES           reduce using rule 52 (expressao_f -> valor_esquerdo .)
+    DIVIDE          reduce using rule 52 (expressao_f -> valor_esquerdo .)
+    PLUS            reduce using rule 52 (expressao_f -> valor_esquerdo .)
+    MINUS           reduce using rule 52 (expressao_f -> valor_esquerdo .)
+    LESS_THAN       reduce using rule 52 (expressao_f -> valor_esquerdo .)
+    LESS_OR_EQUAL   reduce using rule 52 (expressao_f -> valor_esquerdo .)
+    GREATER_THAN    reduce using rule 52 (expressao_f -> valor_esquerdo .)
+    GREATER_OR_EQUAL reduce using rule 52 (expressao_f -> valor_esquerdo .)
+    EQUAL_EQUAL     reduce using rule 52 (expressao_f -> valor_esquerdo .)
+    NOT_EQUAL       reduce using rule 52 (expressao_f -> valor_esquerdo .)
+    RIGHT_PARENTHESIS reduce using rule 52 (expressao_f -> valor_esquerdo .)
+    AND             reduce using rule 52 (expressao_f -> valor_esquerdo .)
+    OR              reduce using rule 52 (expressao_f -> valor_esquerdo .)
+    SEMI_COLON      reduce using rule 52 (expressao_f -> valor_esquerdo .)
+    RIGHT_SQUARE    reduce using rule 52 (expressao_f -> valor_esquerdo .)
+    COMMA           reduce using rule 52 (expressao_f -> valor_esquerdo .)
+    PLUS_PLUS       shift and go to state 118
+    MINUS_MINUS     shift and go to state 119
+    DOT             shift and go to state 77
+    LEFT_SQUARE     shift and go to state 78
+
+
+state 89
+
+    (53) expressao_f -> PLUS_PLUS . valor_esquerdo
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    IDU             shift and go to state 70
+
+    valor_esquerdo                 shift and go to state 120
+
+state 90
+
+    (54) expressao_f -> MINUS_MINUS . valor_esquerdo
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    IDU             shift and go to state 70
+
+    valor_esquerdo                 shift and go to state 121
+
+state 91
+
+    (58) expressao_f -> IDU . LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (70) valor_esquerdo -> IDU .
+
+    LEFT_PARENTHESIS shift and go to state 122
+    PLUS_PLUS       reduce using rule 70 (valor_esquerdo -> IDU .)
+    MINUS_MINUS     reduce using rule 70 (valor_esquerdo -> IDU .)
+    DOT             reduce using rule 70 (valor_esquerdo -> IDU .)
+    LEFT_SQUARE     reduce using rule 70 (valor_esquerdo -> IDU .)
+    TIMES           reduce using rule 70 (valor_esquerdo -> IDU .)
+    DIVIDE          reduce using rule 70 (valor_esquerdo -> IDU .)
+    PLUS            reduce using rule 70 (valor_esquerdo -> IDU .)
+    MINUS           reduce using rule 70 (valor_esquerdo -> IDU .)
+    LESS_THAN       reduce using rule 70 (valor_esquerdo -> IDU .)
+    LESS_OR_EQUAL   reduce using rule 70 (valor_esquerdo -> IDU .)
+    GREATER_THAN    reduce using rule 70 (valor_esquerdo -> IDU .)
+    GREATER_OR_EQUAL reduce using rule 70 (valor_esquerdo -> IDU .)
+    EQUAL_EQUAL     reduce using rule 70 (valor_esquerdo -> IDU .)
+    NOT_EQUAL       reduce using rule 70 (valor_esquerdo -> IDU .)
+    RIGHT_PARENTHESIS reduce using rule 70 (valor_esquerdo -> IDU .)
+    AND             reduce using rule 70 (valor_esquerdo -> IDU .)
+    OR              reduce using rule 70 (valor_esquerdo -> IDU .)
+    SEMI_COLON      reduce using rule 70 (valor_esquerdo -> IDU .)
+    RIGHT_SQUARE    reduce using rule 70 (valor_esquerdo -> IDU .)
+    COMMA           reduce using rule 70 (valor_esquerdo -> IDU .)
+
+
+state 92
+
+    (60) expressao_f -> NOT . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    expressao_f                    shift and go to state 123
+    valor_esquerdo                 shift and go to state 88
+
+state 93
+
+    (61) expressao_f -> TRUE .
+
+    TIMES           reduce using rule 61 (expressao_f -> TRUE .)
+    DIVIDE          reduce using rule 61 (expressao_f -> TRUE .)
+    PLUS            reduce using rule 61 (expressao_f -> TRUE .)
+    MINUS           reduce using rule 61 (expressao_f -> TRUE .)
+    LESS_THAN       reduce using rule 61 (expressao_f -> TRUE .)
+    LESS_OR_EQUAL   reduce using rule 61 (expressao_f -> TRUE .)
+    GREATER_THAN    reduce using rule 61 (expressao_f -> TRUE .)
+    GREATER_OR_EQUAL reduce using rule 61 (expressao_f -> TRUE .)
+    EQUAL_EQUAL     reduce using rule 61 (expressao_f -> TRUE .)
+    NOT_EQUAL       reduce using rule 61 (expressao_f -> TRUE .)
+    RIGHT_PARENTHESIS reduce using rule 61 (expressao_f -> TRUE .)
+    AND             reduce using rule 61 (expressao_f -> TRUE .)
+    OR              reduce using rule 61 (expressao_f -> TRUE .)
+    SEMI_COLON      reduce using rule 61 (expressao_f -> TRUE .)
+    RIGHT_SQUARE    reduce using rule 61 (expressao_f -> TRUE .)
+    COMMA           reduce using rule 61 (expressao_f -> TRUE .)
+
+
+state 94
+
+    (62) expressao_f -> FALSE .
+
+    TIMES           reduce using rule 62 (expressao_f -> FALSE .)
+    DIVIDE          reduce using rule 62 (expressao_f -> FALSE .)
+    PLUS            reduce using rule 62 (expressao_f -> FALSE .)
+    MINUS           reduce using rule 62 (expressao_f -> FALSE .)
+    LESS_THAN       reduce using rule 62 (expressao_f -> FALSE .)
+    LESS_OR_EQUAL   reduce using rule 62 (expressao_f -> FALSE .)
+    GREATER_THAN    reduce using rule 62 (expressao_f -> FALSE .)
+    GREATER_OR_EQUAL reduce using rule 62 (expressao_f -> FALSE .)
+    EQUAL_EQUAL     reduce using rule 62 (expressao_f -> FALSE .)
+    NOT_EQUAL       reduce using rule 62 (expressao_f -> FALSE .)
+    RIGHT_PARENTHESIS reduce using rule 62 (expressao_f -> FALSE .)
+    AND             reduce using rule 62 (expressao_f -> FALSE .)
+    OR              reduce using rule 62 (expressao_f -> FALSE .)
+    SEMI_COLON      reduce using rule 62 (expressao_f -> FALSE .)
+    RIGHT_SQUARE    reduce using rule 62 (expressao_f -> FALSE .)
+    COMMA           reduce using rule 62 (expressao_f -> FALSE .)
+
+
+state 95
+
+    (63) expressao_f -> CHARACTER .
+
+    TIMES           reduce using rule 63 (expressao_f -> CHARACTER .)
+    DIVIDE          reduce using rule 63 (expressao_f -> CHARACTER .)
+    PLUS            reduce using rule 63 (expressao_f -> CHARACTER .)
+    MINUS           reduce using rule 63 (expressao_f -> CHARACTER .)
+    LESS_THAN       reduce using rule 63 (expressao_f -> CHARACTER .)
+    LESS_OR_EQUAL   reduce using rule 63 (expressao_f -> CHARACTER .)
+    GREATER_THAN    reduce using rule 63 (expressao_f -> CHARACTER .)
+    GREATER_OR_EQUAL reduce using rule 63 (expressao_f -> CHARACTER .)
+    EQUAL_EQUAL     reduce using rule 63 (expressao_f -> CHARACTER .)
+    NOT_EQUAL       reduce using rule 63 (expressao_f -> CHARACTER .)
+    RIGHT_PARENTHESIS reduce using rule 63 (expressao_f -> CHARACTER .)
+    AND             reduce using rule 63 (expressao_f -> CHARACTER .)
+    OR              reduce using rule 63 (expressao_f -> CHARACTER .)
+    SEMI_COLON      reduce using rule 63 (expressao_f -> CHARACTER .)
+    RIGHT_SQUARE    reduce using rule 63 (expressao_f -> CHARACTER .)
+    COMMA           reduce using rule 63 (expressao_f -> CHARACTER .)
+
+
+state 96
+
+    (64) expressao_f -> STRINGVAL .
+
+    TIMES           reduce using rule 64 (expressao_f -> STRINGVAL .)
+    DIVIDE          reduce using rule 64 (expressao_f -> STRINGVAL .)
+    PLUS            reduce using rule 64 (expressao_f -> STRINGVAL .)
+    MINUS           reduce using rule 64 (expressao_f -> STRINGVAL .)
+    LESS_THAN       reduce using rule 64 (expressao_f -> STRINGVAL .)
+    LESS_OR_EQUAL   reduce using rule 64 (expressao_f -> STRINGVAL .)
+    GREATER_THAN    reduce using rule 64 (expressao_f -> STRINGVAL .)
+    GREATER_OR_EQUAL reduce using rule 64 (expressao_f -> STRINGVAL .)
+    EQUAL_EQUAL     reduce using rule 64 (expressao_f -> STRINGVAL .)
+    NOT_EQUAL       reduce using rule 64 (expressao_f -> STRINGVAL .)
+    RIGHT_PARENTHESIS reduce using rule 64 (expressao_f -> STRINGVAL .)
+    AND             reduce using rule 64 (expressao_f -> STRINGVAL .)
+    OR              reduce using rule 64 (expressao_f -> STRINGVAL .)
+    SEMI_COLON      reduce using rule 64 (expressao_f -> STRINGVAL .)
+    RIGHT_SQUARE    reduce using rule 64 (expressao_f -> STRINGVAL .)
+    COMMA           reduce using rule 64 (expressao_f -> STRINGVAL .)
+
+
+state 97
+
+    (65) expressao_f -> NUMERAL .
+
+    TIMES           reduce using rule 65 (expressao_f -> NUMERAL .)
+    DIVIDE          reduce using rule 65 (expressao_f -> NUMERAL .)
+    PLUS            reduce using rule 65 (expressao_f -> NUMERAL .)
+    MINUS           reduce using rule 65 (expressao_f -> NUMERAL .)
+    LESS_THAN       reduce using rule 65 (expressao_f -> NUMERAL .)
+    LESS_OR_EQUAL   reduce using rule 65 (expressao_f -> NUMERAL .)
+    GREATER_THAN    reduce using rule 65 (expressao_f -> NUMERAL .)
+    GREATER_OR_EQUAL reduce using rule 65 (expressao_f -> NUMERAL .)
+    EQUAL_EQUAL     reduce using rule 65 (expressao_f -> NUMERAL .)
+    NOT_EQUAL       reduce using rule 65 (expressao_f -> NUMERAL .)
+    RIGHT_PARENTHESIS reduce using rule 65 (expressao_f -> NUMERAL .)
+    AND             reduce using rule 65 (expressao_f -> NUMERAL .)
+    OR              reduce using rule 65 (expressao_f -> NUMERAL .)
+    SEMI_COLON      reduce using rule 65 (expressao_f -> NUMERAL .)
+    RIGHT_SQUARE    reduce using rule 65 (expressao_f -> NUMERAL .)
+    COMMA           reduce using rule 65 (expressao_f -> NUMERAL .)
+
+
+state 98
+
+    (30) comando -> WHILE LEFT_PARENTHESIS expressao . RIGHT_PARENTHESIS comando
+    (36) expressao -> expressao . AND expressao_l
+    (37) expressao -> expressao . OR expressao_l
+
+    RIGHT_PARENTHESIS shift and go to state 124
+    AND             shift and go to state 105
+    OR              shift and go to state 106
+
+
+state 99
+
+    (31) comando -> DO comando WHILE . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
+
+    LEFT_PARENTHESIS shift and go to state 125
+
+
+state 100
+
+    (33) comando -> valor_esquerdo EQUALS expressao . SEMI_COLON
+    (36) expressao -> expressao . AND expressao_l
+    (37) expressao -> expressao . OR expressao_l
+
+    SEMI_COLON      shift and go to state 126
+    AND             shift and go to state 105
+    OR              shift and go to state 106
+
+
+state 101
+
+    (68) valor_esquerdo -> valor_esquerdo DOT IDU .
+
+    EQUALS          reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+    DOT             reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+    LEFT_SQUARE     reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+    PLUS_PLUS       reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+    MINUS_MINUS     reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+    TIMES           reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+    DIVIDE          reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+    PLUS            reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+    MINUS           reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+    LESS_THAN       reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+    LESS_OR_EQUAL   reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+    GREATER_THAN    reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+    GREATER_OR_EQUAL reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+    EQUAL_EQUAL     reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+    NOT_EQUAL       reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+    RIGHT_PARENTHESIS reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+    AND             reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+    OR              reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+    SEMI_COLON      reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+    RIGHT_SQUARE    reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+    COMMA           reduce using rule 68 (valor_esquerdo -> valor_esquerdo DOT IDU .)
+
+
+state 102
+
+    (69) valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao . RIGHT_SQUARE
+    (36) expressao -> expressao . AND expressao_l
+    (37) expressao -> expressao . OR expressao_l
+
+    RIGHT_SQUARE    shift and go to state 127
+    AND             shift and go to state 105
+    OR              shift and go to state 106
+
+
+state 103
+
+    (57) expressao_f -> LEFT_PARENTHESIS expressao . RIGHT_PARENTHESIS
+    (36) expressao -> expressao . AND expressao_l
+    (37) expressao -> expressao . OR expressao_l
+
+    RIGHT_PARENTHESIS shift and go to state 128
+    AND             shift and go to state 105
+    OR              shift and go to state 106
+
+
+state 104
+
+    (28) comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS . comando
+    (29) comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS . comando ELSE comando
+    (28) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    (29) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE comando
+    (30) comando -> . WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    (31) comando -> . DO comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
+    (32) comando -> . bloco
+    (33) comando -> . valor_esquerdo EQUALS expressao SEMI_COLON
+    (34) comando -> . BREAK SEMI_COLON
+    (35) comando -> . CONTINUE SEMI_COLON
+    (20) bloco -> . LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    IF              shift and go to state 63
+    WHILE           shift and go to state 64
+    DO              shift and go to state 65
+    BREAK           shift and go to state 68
+    CONTINUE        shift and go to state 69
+    LEFT_BRACES     shift and go to state 53
+    IDU             shift and go to state 70
+
+    comando                        shift and go to state 129
+    bloco                          shift and go to state 66
+    valor_esquerdo                 shift and go to state 67
+
+state 105
+
+    (36) expressao -> expressao AND . expressao_l
+    (39) expressao_l -> . expressao_l LESS_THAN expressao_r
+    (40) expressao_l -> . expressao_l LESS_OR_EQUAL expressao_r
+    (41) expressao_l -> . expressao_l GREATER_THAN expressao_r
+    (42) expressao_l -> . expressao_l GREATER_OR_EQUAL expressao_r
+    (43) expressao_l -> . expressao_l EQUAL_EQUAL expressao_r
+    (44) expressao_l -> . expressao_l NOT_EQUAL expressao_r
+    (45) expressao_l -> . expressao_r
+    (46) expressao_r -> . expressao_r PLUS expressao_y
+    (47) expressao_r -> . expressao_r MINUS expressao_y
+    (48) expressao_r -> . expressao_y
+    (49) expressao_y -> . expressao_y TIMES expressao_f
+    (50) expressao_y -> . expressao_y DIVIDE expressao_f
+    (51) expressao_y -> . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    expressao_l                    shift and go to state 130
+    expressao_r                    shift and go to state 84
+    expressao_y                    shift and go to state 85
+    expressao_f                    shift and go to state 87
+    valor_esquerdo                 shift and go to state 88
+
+state 106
+
+    (37) expressao -> expressao OR . expressao_l
+    (39) expressao_l -> . expressao_l LESS_THAN expressao_r
+    (40) expressao_l -> . expressao_l LESS_OR_EQUAL expressao_r
+    (41) expressao_l -> . expressao_l GREATER_THAN expressao_r
+    (42) expressao_l -> . expressao_l GREATER_OR_EQUAL expressao_r
+    (43) expressao_l -> . expressao_l EQUAL_EQUAL expressao_r
+    (44) expressao_l -> . expressao_l NOT_EQUAL expressao_r
+    (45) expressao_l -> . expressao_r
+    (46) expressao_r -> . expressao_r PLUS expressao_y
+    (47) expressao_r -> . expressao_r MINUS expressao_y
+    (48) expressao_r -> . expressao_y
+    (49) expressao_y -> . expressao_y TIMES expressao_f
+    (50) expressao_y -> . expressao_y DIVIDE expressao_f
+    (51) expressao_y -> . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    expressao_l                    shift and go to state 131
+    expressao_r                    shift and go to state 84
+    expressao_y                    shift and go to state 85
+    expressao_f                    shift and go to state 87
+    valor_esquerdo                 shift and go to state 88
+
+state 107
+
+    (39) expressao_l -> expressao_l LESS_THAN . expressao_r
+    (46) expressao_r -> . expressao_r PLUS expressao_y
+    (47) expressao_r -> . expressao_r MINUS expressao_y
+    (48) expressao_r -> . expressao_y
+    (49) expressao_y -> . expressao_y TIMES expressao_f
+    (50) expressao_y -> . expressao_y DIVIDE expressao_f
+    (51) expressao_y -> . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    expressao_r                    shift and go to state 132
+    expressao_y                    shift and go to state 85
+    expressao_f                    shift and go to state 87
+    valor_esquerdo                 shift and go to state 88
+
+state 108
+
+    (40) expressao_l -> expressao_l LESS_OR_EQUAL . expressao_r
+    (46) expressao_r -> . expressao_r PLUS expressao_y
+    (47) expressao_r -> . expressao_r MINUS expressao_y
+    (48) expressao_r -> . expressao_y
+    (49) expressao_y -> . expressao_y TIMES expressao_f
+    (50) expressao_y -> . expressao_y DIVIDE expressao_f
+    (51) expressao_y -> . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    expressao_r                    shift and go to state 133
+    expressao_y                    shift and go to state 85
+    expressao_f                    shift and go to state 87
+    valor_esquerdo                 shift and go to state 88
+
+state 109
+
+    (41) expressao_l -> expressao_l GREATER_THAN . expressao_r
+    (46) expressao_r -> . expressao_r PLUS expressao_y
+    (47) expressao_r -> . expressao_r MINUS expressao_y
+    (48) expressao_r -> . expressao_y
+    (49) expressao_y -> . expressao_y TIMES expressao_f
+    (50) expressao_y -> . expressao_y DIVIDE expressao_f
+    (51) expressao_y -> . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    expressao_r                    shift and go to state 134
+    expressao_y                    shift and go to state 85
+    expressao_f                    shift and go to state 87
+    valor_esquerdo                 shift and go to state 88
+
+state 110
+
+    (42) expressao_l -> expressao_l GREATER_OR_EQUAL . expressao_r
+    (46) expressao_r -> . expressao_r PLUS expressao_y
+    (47) expressao_r -> . expressao_r MINUS expressao_y
+    (48) expressao_r -> . expressao_y
+    (49) expressao_y -> . expressao_y TIMES expressao_f
+    (50) expressao_y -> . expressao_y DIVIDE expressao_f
+    (51) expressao_y -> . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    expressao_r                    shift and go to state 135
+    expressao_y                    shift and go to state 85
+    expressao_f                    shift and go to state 87
+    valor_esquerdo                 shift and go to state 88
+
+state 111
+
+    (43) expressao_l -> expressao_l EQUAL_EQUAL . expressao_r
+    (46) expressao_r -> . expressao_r PLUS expressao_y
+    (47) expressao_r -> . expressao_r MINUS expressao_y
+    (48) expressao_r -> . expressao_y
+    (49) expressao_y -> . expressao_y TIMES expressao_f
+    (50) expressao_y -> . expressao_y DIVIDE expressao_f
+    (51) expressao_y -> . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    expressao_r                    shift and go to state 136
+    expressao_y                    shift and go to state 85
+    expressao_f                    shift and go to state 87
+    valor_esquerdo                 shift and go to state 88
+
+state 112
+
+    (44) expressao_l -> expressao_l NOT_EQUAL . expressao_r
+    (46) expressao_r -> . expressao_r PLUS expressao_y
+    (47) expressao_r -> . expressao_r MINUS expressao_y
+    (48) expressao_r -> . expressao_y
+    (49) expressao_y -> . expressao_y TIMES expressao_f
+    (50) expressao_y -> . expressao_y DIVIDE expressao_f
+    (51) expressao_y -> . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    expressao_r                    shift and go to state 137
+    expressao_y                    shift and go to state 85
+    expressao_f                    shift and go to state 87
+    valor_esquerdo                 shift and go to state 88
+
+state 113
+
+    (46) expressao_r -> expressao_r PLUS . expressao_y
+    (49) expressao_y -> . expressao_y TIMES expressao_f
+    (50) expressao_y -> . expressao_y DIVIDE expressao_f
+    (51) expressao_y -> . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    expressao_y                    shift and go to state 138
+    expressao_f                    shift and go to state 87
+    valor_esquerdo                 shift and go to state 88
+
+state 114
+
+    (47) expressao_r -> expressao_r MINUS . expressao_y
+    (49) expressao_y -> . expressao_y TIMES expressao_f
+    (50) expressao_y -> . expressao_y DIVIDE expressao_f
+    (51) expressao_y -> . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    expressao_y                    shift and go to state 139
+    expressao_f                    shift and go to state 87
+    valor_esquerdo                 shift and go to state 88
+
+state 115
+
+    (49) expressao_y -> expressao_y TIMES . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    expressao_f                    shift and go to state 140
+    valor_esquerdo                 shift and go to state 88
+
+state 116
+
+    (50) expressao_y -> expressao_y DIVIDE . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    expressao_f                    shift and go to state 141
+    valor_esquerdo                 shift and go to state 88
+
+state 117
+
+    (59) expressao_f -> MINUS expressao_f .
+
+    TIMES           reduce using rule 59 (expressao_f -> MINUS expressao_f .)
+    DIVIDE          reduce using rule 59 (expressao_f -> MINUS expressao_f .)
+    PLUS            reduce using rule 59 (expressao_f -> MINUS expressao_f .)
+    MINUS           reduce using rule 59 (expressao_f -> MINUS expressao_f .)
+    LESS_THAN       reduce using rule 59 (expressao_f -> MINUS expressao_f .)
+    LESS_OR_EQUAL   reduce using rule 59 (expressao_f -> MINUS expressao_f .)
+    GREATER_THAN    reduce using rule 59 (expressao_f -> MINUS expressao_f .)
+    GREATER_OR_EQUAL reduce using rule 59 (expressao_f -> MINUS expressao_f .)
+    EQUAL_EQUAL     reduce using rule 59 (expressao_f -> MINUS expressao_f .)
+    NOT_EQUAL       reduce using rule 59 (expressao_f -> MINUS expressao_f .)
+    RIGHT_PARENTHESIS reduce using rule 59 (expressao_f -> MINUS expressao_f .)
+    AND             reduce using rule 59 (expressao_f -> MINUS expressao_f .)
+    OR              reduce using rule 59 (expressao_f -> MINUS expressao_f .)
+    SEMI_COLON      reduce using rule 59 (expressao_f -> MINUS expressao_f .)
+    RIGHT_SQUARE    reduce using rule 59 (expressao_f -> MINUS expressao_f .)
+    COMMA           reduce using rule 59 (expressao_f -> MINUS expressao_f .)
+
+
+state 118
+
+    (55) expressao_f -> valor_esquerdo PLUS_PLUS .
+
+    TIMES           reduce using rule 55 (expressao_f -> valor_esquerdo PLUS_PLUS .)
+    DIVIDE          reduce using rule 55 (expressao_f -> valor_esquerdo PLUS_PLUS .)
+    PLUS            reduce using rule 55 (expressao_f -> valor_esquerdo PLUS_PLUS .)
+    MINUS           reduce using rule 55 (expressao_f -> valor_esquerdo PLUS_PLUS .)
+    LESS_THAN       reduce using rule 55 (expressao_f -> valor_esquerdo PLUS_PLUS .)
+    LESS_OR_EQUAL   reduce using rule 55 (expressao_f -> valor_esquerdo PLUS_PLUS .)
+    GREATER_THAN    reduce using rule 55 (expressao_f -> valor_esquerdo PLUS_PLUS .)
+    GREATER_OR_EQUAL reduce using rule 55 (expressao_f -> valor_esquerdo PLUS_PLUS .)
+    EQUAL_EQUAL     reduce using rule 55 (expressao_f -> valor_esquerdo PLUS_PLUS .)
+    NOT_EQUAL       reduce using rule 55 (expressao_f -> valor_esquerdo PLUS_PLUS .)
+    RIGHT_PARENTHESIS reduce using rule 55 (expressao_f -> valor_esquerdo PLUS_PLUS .)
+    AND             reduce using rule 55 (expressao_f -> valor_esquerdo PLUS_PLUS .)
+    OR              reduce using rule 55 (expressao_f -> valor_esquerdo PLUS_PLUS .)
+    SEMI_COLON      reduce using rule 55 (expressao_f -> valor_esquerdo PLUS_PLUS .)
+    RIGHT_SQUARE    reduce using rule 55 (expressao_f -> valor_esquerdo PLUS_PLUS .)
+    COMMA           reduce using rule 55 (expressao_f -> valor_esquerdo PLUS_PLUS .)
+
+
+state 119
+
+    (56) expressao_f -> valor_esquerdo MINUS_MINUS .
+
+    TIMES           reduce using rule 56 (expressao_f -> valor_esquerdo MINUS_MINUS .)
+    DIVIDE          reduce using rule 56 (expressao_f -> valor_esquerdo MINUS_MINUS .)
+    PLUS            reduce using rule 56 (expressao_f -> valor_esquerdo MINUS_MINUS .)
+    MINUS           reduce using rule 56 (expressao_f -> valor_esquerdo MINUS_MINUS .)
+    LESS_THAN       reduce using rule 56 (expressao_f -> valor_esquerdo MINUS_MINUS .)
+    LESS_OR_EQUAL   reduce using rule 56 (expressao_f -> valor_esquerdo MINUS_MINUS .)
+    GREATER_THAN    reduce using rule 56 (expressao_f -> valor_esquerdo MINUS_MINUS .)
+    GREATER_OR_EQUAL reduce using rule 56 (expressao_f -> valor_esquerdo MINUS_MINUS .)
+    EQUAL_EQUAL     reduce using rule 56 (expressao_f -> valor_esquerdo MINUS_MINUS .)
+    NOT_EQUAL       reduce using rule 56 (expressao_f -> valor_esquerdo MINUS_MINUS .)
+    RIGHT_PARENTHESIS reduce using rule 56 (expressao_f -> valor_esquerdo MINUS_MINUS .)
+    AND             reduce using rule 56 (expressao_f -> valor_esquerdo MINUS_MINUS .)
+    OR              reduce using rule 56 (expressao_f -> valor_esquerdo MINUS_MINUS .)
+    SEMI_COLON      reduce using rule 56 (expressao_f -> valor_esquerdo MINUS_MINUS .)
+    RIGHT_SQUARE    reduce using rule 56 (expressao_f -> valor_esquerdo MINUS_MINUS .)
+    COMMA           reduce using rule 56 (expressao_f -> valor_esquerdo MINUS_MINUS .)
+
+
+state 120
+
+    (53) expressao_f -> PLUS_PLUS valor_esquerdo .
+    (68) valor_esquerdo -> valor_esquerdo . DOT IDU
+    (69) valor_esquerdo -> valor_esquerdo . LEFT_SQUARE expressao RIGHT_SQUARE
+
+    TIMES           reduce using rule 53 (expressao_f -> PLUS_PLUS valor_esquerdo .)
+    DIVIDE          reduce using rule 53 (expressao_f -> PLUS_PLUS valor_esquerdo .)
+    PLUS            reduce using rule 53 (expressao_f -> PLUS_PLUS valor_esquerdo .)
+    MINUS           reduce using rule 53 (expressao_f -> PLUS_PLUS valor_esquerdo .)
+    LESS_THAN       reduce using rule 53 (expressao_f -> PLUS_PLUS valor_esquerdo .)
+    LESS_OR_EQUAL   reduce using rule 53 (expressao_f -> PLUS_PLUS valor_esquerdo .)
+    GREATER_THAN    reduce using rule 53 (expressao_f -> PLUS_PLUS valor_esquerdo .)
+    GREATER_OR_EQUAL reduce using rule 53 (expressao_f -> PLUS_PLUS valor_esquerdo .)
+    EQUAL_EQUAL     reduce using rule 53 (expressao_f -> PLUS_PLUS valor_esquerdo .)
+    NOT_EQUAL       reduce using rule 53 (expressao_f -> PLUS_PLUS valor_esquerdo .)
+    RIGHT_PARENTHESIS reduce using rule 53 (expressao_f -> PLUS_PLUS valor_esquerdo .)
+    AND             reduce using rule 53 (expressao_f -> PLUS_PLUS valor_esquerdo .)
+    OR              reduce using rule 53 (expressao_f -> PLUS_PLUS valor_esquerdo .)
+    SEMI_COLON      reduce using rule 53 (expressao_f -> PLUS_PLUS valor_esquerdo .)
+    RIGHT_SQUARE    reduce using rule 53 (expressao_f -> PLUS_PLUS valor_esquerdo .)
+    COMMA           reduce using rule 53 (expressao_f -> PLUS_PLUS valor_esquerdo .)
+    DOT             shift and go to state 77
+    LEFT_SQUARE     shift and go to state 78
+
+
+state 121
+
+    (54) expressao_f -> MINUS_MINUS valor_esquerdo .
+    (68) valor_esquerdo -> valor_esquerdo . DOT IDU
+    (69) valor_esquerdo -> valor_esquerdo . LEFT_SQUARE expressao RIGHT_SQUARE
+
+    TIMES           reduce using rule 54 (expressao_f -> MINUS_MINUS valor_esquerdo .)
+    DIVIDE          reduce using rule 54 (expressao_f -> MINUS_MINUS valor_esquerdo .)
+    PLUS            reduce using rule 54 (expressao_f -> MINUS_MINUS valor_esquerdo .)
+    MINUS           reduce using rule 54 (expressao_f -> MINUS_MINUS valor_esquerdo .)
+    LESS_THAN       reduce using rule 54 (expressao_f -> MINUS_MINUS valor_esquerdo .)
+    LESS_OR_EQUAL   reduce using rule 54 (expressao_f -> MINUS_MINUS valor_esquerdo .)
+    GREATER_THAN    reduce using rule 54 (expressao_f -> MINUS_MINUS valor_esquerdo .)
+    GREATER_OR_EQUAL reduce using rule 54 (expressao_f -> MINUS_MINUS valor_esquerdo .)
+    EQUAL_EQUAL     reduce using rule 54 (expressao_f -> MINUS_MINUS valor_esquerdo .)
+    NOT_EQUAL       reduce using rule 54 (expressao_f -> MINUS_MINUS valor_esquerdo .)
+    RIGHT_PARENTHESIS reduce using rule 54 (expressao_f -> MINUS_MINUS valor_esquerdo .)
+    AND             reduce using rule 54 (expressao_f -> MINUS_MINUS valor_esquerdo .)
+    OR              reduce using rule 54 (expressao_f -> MINUS_MINUS valor_esquerdo .)
+    SEMI_COLON      reduce using rule 54 (expressao_f -> MINUS_MINUS valor_esquerdo .)
+    RIGHT_SQUARE    reduce using rule 54 (expressao_f -> MINUS_MINUS valor_esquerdo .)
+    COMMA           reduce using rule 54 (expressao_f -> MINUS_MINUS valor_esquerdo .)
+    DOT             shift and go to state 77
+    LEFT_SQUARE     shift and go to state 78
+
+
+state 122
+
+    (58) expressao_f -> IDU LEFT_PARENTHESIS . lista_expressoes RIGHT_PARENTHESIS
+    (66) lista_expressoes -> . lista_expressoes COMMA expressao
+    (67) lista_expressoes -> . expressao
+    (36) expressao -> . expressao AND expressao_l
+    (37) expressao -> . expressao OR expressao_l
+    (38) expressao -> . expressao_l
+    (39) expressao_l -> . expressao_l LESS_THAN expressao_r
+    (40) expressao_l -> . expressao_l LESS_OR_EQUAL expressao_r
+    (41) expressao_l -> . expressao_l GREATER_THAN expressao_r
+    (42) expressao_l -> . expressao_l GREATER_OR_EQUAL expressao_r
+    (43) expressao_l -> . expressao_l EQUAL_EQUAL expressao_r
+    (44) expressao_l -> . expressao_l NOT_EQUAL expressao_r
+    (45) expressao_l -> . expressao_r
+    (46) expressao_r -> . expressao_r PLUS expressao_y
+    (47) expressao_r -> . expressao_r MINUS expressao_y
+    (48) expressao_r -> . expressao_y
+    (49) expressao_y -> . expressao_y TIMES expressao_f
+    (50) expressao_y -> . expressao_y DIVIDE expressao_f
+    (51) expressao_y -> . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    lista_expressoes               shift and go to state 142
+    expressao                      shift and go to state 143
+    expressao_l                    shift and go to state 83
+    expressao_r                    shift and go to state 84
+    expressao_y                    shift and go to state 85
+    expressao_f                    shift and go to state 87
+    valor_esquerdo                 shift and go to state 88
+
+state 123
+
+    (60) expressao_f -> NOT expressao_f .
+
+    TIMES           reduce using rule 60 (expressao_f -> NOT expressao_f .)
+    DIVIDE          reduce using rule 60 (expressao_f -> NOT expressao_f .)
+    PLUS            reduce using rule 60 (expressao_f -> NOT expressao_f .)
+    MINUS           reduce using rule 60 (expressao_f -> NOT expressao_f .)
+    LESS_THAN       reduce using rule 60 (expressao_f -> NOT expressao_f .)
+    LESS_OR_EQUAL   reduce using rule 60 (expressao_f -> NOT expressao_f .)
+    GREATER_THAN    reduce using rule 60 (expressao_f -> NOT expressao_f .)
+    GREATER_OR_EQUAL reduce using rule 60 (expressao_f -> NOT expressao_f .)
+    EQUAL_EQUAL     reduce using rule 60 (expressao_f -> NOT expressao_f .)
+    NOT_EQUAL       reduce using rule 60 (expressao_f -> NOT expressao_f .)
+    RIGHT_PARENTHESIS reduce using rule 60 (expressao_f -> NOT expressao_f .)
+    AND             reduce using rule 60 (expressao_f -> NOT expressao_f .)
+    OR              reduce using rule 60 (expressao_f -> NOT expressao_f .)
+    SEMI_COLON      reduce using rule 60 (expressao_f -> NOT expressao_f .)
+    RIGHT_SQUARE    reduce using rule 60 (expressao_f -> NOT expressao_f .)
+    COMMA           reduce using rule 60 (expressao_f -> NOT expressao_f .)
+
+
+state 124
+
+    (30) comando -> WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS . comando
+    (28) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    (29) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE comando
+    (30) comando -> . WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    (31) comando -> . DO comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
+    (32) comando -> . bloco
+    (33) comando -> . valor_esquerdo EQUALS expressao SEMI_COLON
+    (34) comando -> . BREAK SEMI_COLON
+    (35) comando -> . CONTINUE SEMI_COLON
+    (20) bloco -> . LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    IF              shift and go to state 63
+    WHILE           shift and go to state 64
+    DO              shift and go to state 65
+    BREAK           shift and go to state 68
+    CONTINUE        shift and go to state 69
+    LEFT_BRACES     shift and go to state 53
+    IDU             shift and go to state 70
+
+    comando                        shift and go to state 144
+    bloco                          shift and go to state 66
+    valor_esquerdo                 shift and go to state 67
+
+state 125
+
+    (31) comando -> DO comando WHILE LEFT_PARENTHESIS . expressao RIGHT_PARENTHESIS SEMI_COLON
+    (36) expressao -> . expressao AND expressao_l
+    (37) expressao -> . expressao OR expressao_l
+    (38) expressao -> . expressao_l
+    (39) expressao_l -> . expressao_l LESS_THAN expressao_r
+    (40) expressao_l -> . expressao_l LESS_OR_EQUAL expressao_r
+    (41) expressao_l -> . expressao_l GREATER_THAN expressao_r
+    (42) expressao_l -> . expressao_l GREATER_OR_EQUAL expressao_r
+    (43) expressao_l -> . expressao_l EQUAL_EQUAL expressao_r
+    (44) expressao_l -> . expressao_l NOT_EQUAL expressao_r
+    (45) expressao_l -> . expressao_r
+    (46) expressao_r -> . expressao_r PLUS expressao_y
+    (47) expressao_r -> . expressao_r MINUS expressao_y
+    (48) expressao_r -> . expressao_y
+    (49) expressao_y -> . expressao_y TIMES expressao_f
+    (50) expressao_y -> . expressao_y DIVIDE expressao_f
+    (51) expressao_y -> . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    expressao                      shift and go to state 145
+    expressao_l                    shift and go to state 83
+    expressao_r                    shift and go to state 84
+    expressao_y                    shift and go to state 85
+    expressao_f                    shift and go to state 87
+    valor_esquerdo                 shift and go to state 88
+
+state 126
+
+    (33) comando -> valor_esquerdo EQUALS expressao SEMI_COLON .
+
+    RIGHT_BRACES    reduce using rule 33 (comando -> valor_esquerdo EQUALS expressao SEMI_COLON .)
+    IF              reduce using rule 33 (comando -> valor_esquerdo EQUALS expressao SEMI_COLON .)
+    WHILE           reduce using rule 33 (comando -> valor_esquerdo EQUALS expressao SEMI_COLON .)
+    DO              reduce using rule 33 (comando -> valor_esquerdo EQUALS expressao SEMI_COLON .)
+    BREAK           reduce using rule 33 (comando -> valor_esquerdo EQUALS expressao SEMI_COLON .)
+    CONTINUE        reduce using rule 33 (comando -> valor_esquerdo EQUALS expressao SEMI_COLON .)
+    LEFT_BRACES     reduce using rule 33 (comando -> valor_esquerdo EQUALS expressao SEMI_COLON .)
+    IDU             reduce using rule 33 (comando -> valor_esquerdo EQUALS expressao SEMI_COLON .)
+    ELSE            reduce using rule 33 (comando -> valor_esquerdo EQUALS expressao SEMI_COLON .)
+
+
+state 127
+
+    (69) valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .
+
+    EQUALS          reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+    DOT             reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+    LEFT_SQUARE     reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+    PLUS_PLUS       reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+    MINUS_MINUS     reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+    TIMES           reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+    DIVIDE          reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+    PLUS            reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+    MINUS           reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+    LESS_THAN       reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+    LESS_OR_EQUAL   reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+    GREATER_THAN    reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+    GREATER_OR_EQUAL reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+    EQUAL_EQUAL     reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+    NOT_EQUAL       reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+    RIGHT_PARENTHESIS reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+    AND             reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+    OR              reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+    SEMI_COLON      reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+    RIGHT_SQUARE    reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+    COMMA           reduce using rule 69 (valor_esquerdo -> valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE .)
+
+
+state 128
+
+    (57) expressao_f -> LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS .
+
+    TIMES           reduce using rule 57 (expressao_f -> LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS .)
+    DIVIDE          reduce using rule 57 (expressao_f -> LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS .)
+    PLUS            reduce using rule 57 (expressao_f -> LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS .)
+    MINUS           reduce using rule 57 (expressao_f -> LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS .)
+    LESS_THAN       reduce using rule 57 (expressao_f -> LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS .)
+    LESS_OR_EQUAL   reduce using rule 57 (expressao_f -> LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS .)
+    GREATER_THAN    reduce using rule 57 (expressao_f -> LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS .)
+    GREATER_OR_EQUAL reduce using rule 57 (expressao_f -> LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS .)
+    EQUAL_EQUAL     reduce using rule 57 (expressao_f -> LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS .)
+    NOT_EQUAL       reduce using rule 57 (expressao_f -> LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS .)
+    RIGHT_PARENTHESIS reduce using rule 57 (expressao_f -> LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS .)
+    AND             reduce using rule 57 (expressao_f -> LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS .)
+    OR              reduce using rule 57 (expressao_f -> LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS .)
+    SEMI_COLON      reduce using rule 57 (expressao_f -> LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS .)
+    RIGHT_SQUARE    reduce using rule 57 (expressao_f -> LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS .)
+    COMMA           reduce using rule 57 (expressao_f -> LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS .)
+
+
+state 129
+
+    (28) comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .
+    (29) comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando . ELSE comando
+
+    RIGHT_BRACES    reduce using rule 28 (comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
+    IF              reduce using rule 28 (comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
+    WHILE           reduce using rule 28 (comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
+    DO              reduce using rule 28 (comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
+    BREAK           reduce using rule 28 (comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
+    CONTINUE        reduce using rule 28 (comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
+    LEFT_BRACES     reduce using rule 28 (comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
+    IDU             reduce using rule 28 (comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
+    ELSE            shift and go to state 146
+
+  ! ELSE            [ reduce using rule 28 (comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .) ]
+
+
+state 130
+
+    (36) expressao -> expressao AND expressao_l .
+    (39) expressao_l -> expressao_l . LESS_THAN expressao_r
+    (40) expressao_l -> expressao_l . LESS_OR_EQUAL expressao_r
+    (41) expressao_l -> expressao_l . GREATER_THAN expressao_r
+    (42) expressao_l -> expressao_l . GREATER_OR_EQUAL expressao_r
+    (43) expressao_l -> expressao_l . EQUAL_EQUAL expressao_r
+    (44) expressao_l -> expressao_l . NOT_EQUAL expressao_r
+
+    RIGHT_PARENTHESIS reduce using rule 36 (expressao -> expressao AND expressao_l .)
+    AND             reduce using rule 36 (expressao -> expressao AND expressao_l .)
+    OR              reduce using rule 36 (expressao -> expressao AND expressao_l .)
+    SEMI_COLON      reduce using rule 36 (expressao -> expressao AND expressao_l .)
+    RIGHT_SQUARE    reduce using rule 36 (expressao -> expressao AND expressao_l .)
+    COMMA           reduce using rule 36 (expressao -> expressao AND expressao_l .)
+    LESS_THAN       shift and go to state 107
+    LESS_OR_EQUAL   shift and go to state 108
+    GREATER_THAN    shift and go to state 109
+    GREATER_OR_EQUAL shift and go to state 110
+    EQUAL_EQUAL     shift and go to state 111
+    NOT_EQUAL       shift and go to state 112
+
+
+state 131
+
+    (37) expressao -> expressao OR expressao_l .
+    (39) expressao_l -> expressao_l . LESS_THAN expressao_r
+    (40) expressao_l -> expressao_l . LESS_OR_EQUAL expressao_r
+    (41) expressao_l -> expressao_l . GREATER_THAN expressao_r
+    (42) expressao_l -> expressao_l . GREATER_OR_EQUAL expressao_r
+    (43) expressao_l -> expressao_l . EQUAL_EQUAL expressao_r
+    (44) expressao_l -> expressao_l . NOT_EQUAL expressao_r
+
+    RIGHT_PARENTHESIS reduce using rule 37 (expressao -> expressao OR expressao_l .)
+    AND             reduce using rule 37 (expressao -> expressao OR expressao_l .)
+    OR              reduce using rule 37 (expressao -> expressao OR expressao_l .)
+    SEMI_COLON      reduce using rule 37 (expressao -> expressao OR expressao_l .)
+    RIGHT_SQUARE    reduce using rule 37 (expressao -> expressao OR expressao_l .)
+    COMMA           reduce using rule 37 (expressao -> expressao OR expressao_l .)
+    LESS_THAN       shift and go to state 107
+    LESS_OR_EQUAL   shift and go to state 108
+    GREATER_THAN    shift and go to state 109
+    GREATER_OR_EQUAL shift and go to state 110
+    EQUAL_EQUAL     shift and go to state 111
+    NOT_EQUAL       shift and go to state 112
+
+
+state 132
+
+    (39) expressao_l -> expressao_l LESS_THAN expressao_r .
+    (46) expressao_r -> expressao_r . PLUS expressao_y
+    (47) expressao_r -> expressao_r . MINUS expressao_y
+
+    LESS_THAN       reduce using rule 39 (expressao_l -> expressao_l LESS_THAN expressao_r .)
+    LESS_OR_EQUAL   reduce using rule 39 (expressao_l -> expressao_l LESS_THAN expressao_r .)
+    GREATER_THAN    reduce using rule 39 (expressao_l -> expressao_l LESS_THAN expressao_r .)
+    GREATER_OR_EQUAL reduce using rule 39 (expressao_l -> expressao_l LESS_THAN expressao_r .)
+    EQUAL_EQUAL     reduce using rule 39 (expressao_l -> expressao_l LESS_THAN expressao_r .)
+    NOT_EQUAL       reduce using rule 39 (expressao_l -> expressao_l LESS_THAN expressao_r .)
+    RIGHT_PARENTHESIS reduce using rule 39 (expressao_l -> expressao_l LESS_THAN expressao_r .)
+    AND             reduce using rule 39 (expressao_l -> expressao_l LESS_THAN expressao_r .)
+    OR              reduce using rule 39 (expressao_l -> expressao_l LESS_THAN expressao_r .)
+    SEMI_COLON      reduce using rule 39 (expressao_l -> expressao_l LESS_THAN expressao_r .)
+    RIGHT_SQUARE    reduce using rule 39 (expressao_l -> expressao_l LESS_THAN expressao_r .)
+    COMMA           reduce using rule 39 (expressao_l -> expressao_l LESS_THAN expressao_r .)
+    PLUS            shift and go to state 113
+    MINUS           shift and go to state 114
+
+
+state 133
+
+    (40) expressao_l -> expressao_l LESS_OR_EQUAL expressao_r .
+    (46) expressao_r -> expressao_r . PLUS expressao_y
+    (47) expressao_r -> expressao_r . MINUS expressao_y
+
+    LESS_THAN       reduce using rule 40 (expressao_l -> expressao_l LESS_OR_EQUAL expressao_r .)
+    LESS_OR_EQUAL   reduce using rule 40 (expressao_l -> expressao_l LESS_OR_EQUAL expressao_r .)
+    GREATER_THAN    reduce using rule 40 (expressao_l -> expressao_l LESS_OR_EQUAL expressao_r .)
+    GREATER_OR_EQUAL reduce using rule 40 (expressao_l -> expressao_l LESS_OR_EQUAL expressao_r .)
+    EQUAL_EQUAL     reduce using rule 40 (expressao_l -> expressao_l LESS_OR_EQUAL expressao_r .)
+    NOT_EQUAL       reduce using rule 40 (expressao_l -> expressao_l LESS_OR_EQUAL expressao_r .)
+    RIGHT_PARENTHESIS reduce using rule 40 (expressao_l -> expressao_l LESS_OR_EQUAL expressao_r .)
+    AND             reduce using rule 40 (expressao_l -> expressao_l LESS_OR_EQUAL expressao_r .)
+    OR              reduce using rule 40 (expressao_l -> expressao_l LESS_OR_EQUAL expressao_r .)
+    SEMI_COLON      reduce using rule 40 (expressao_l -> expressao_l LESS_OR_EQUAL expressao_r .)
+    RIGHT_SQUARE    reduce using rule 40 (expressao_l -> expressao_l LESS_OR_EQUAL expressao_r .)
+    COMMA           reduce using rule 40 (expressao_l -> expressao_l LESS_OR_EQUAL expressao_r .)
+    PLUS            shift and go to state 113
+    MINUS           shift and go to state 114
+
+
+state 134
+
+    (41) expressao_l -> expressao_l GREATER_THAN expressao_r .
+    (46) expressao_r -> expressao_r . PLUS expressao_y
+    (47) expressao_r -> expressao_r . MINUS expressao_y
+
+    LESS_THAN       reduce using rule 41 (expressao_l -> expressao_l GREATER_THAN expressao_r .)
+    LESS_OR_EQUAL   reduce using rule 41 (expressao_l -> expressao_l GREATER_THAN expressao_r .)
+    GREATER_THAN    reduce using rule 41 (expressao_l -> expressao_l GREATER_THAN expressao_r .)
+    GREATER_OR_EQUAL reduce using rule 41 (expressao_l -> expressao_l GREATER_THAN expressao_r .)
+    EQUAL_EQUAL     reduce using rule 41 (expressao_l -> expressao_l GREATER_THAN expressao_r .)
+    NOT_EQUAL       reduce using rule 41 (expressao_l -> expressao_l GREATER_THAN expressao_r .)
+    RIGHT_PARENTHESIS reduce using rule 41 (expressao_l -> expressao_l GREATER_THAN expressao_r .)
+    AND             reduce using rule 41 (expressao_l -> expressao_l GREATER_THAN expressao_r .)
+    OR              reduce using rule 41 (expressao_l -> expressao_l GREATER_THAN expressao_r .)
+    SEMI_COLON      reduce using rule 41 (expressao_l -> expressao_l GREATER_THAN expressao_r .)
+    RIGHT_SQUARE    reduce using rule 41 (expressao_l -> expressao_l GREATER_THAN expressao_r .)
+    COMMA           reduce using rule 41 (expressao_l -> expressao_l GREATER_THAN expressao_r .)
+    PLUS            shift and go to state 113
+    MINUS           shift and go to state 114
+
+
+state 135
+
+    (42) expressao_l -> expressao_l GREATER_OR_EQUAL expressao_r .
+    (46) expressao_r -> expressao_r . PLUS expressao_y
+    (47) expressao_r -> expressao_r . MINUS expressao_y
+
+    LESS_THAN       reduce using rule 42 (expressao_l -> expressao_l GREATER_OR_EQUAL expressao_r .)
+    LESS_OR_EQUAL   reduce using rule 42 (expressao_l -> expressao_l GREATER_OR_EQUAL expressao_r .)
+    GREATER_THAN    reduce using rule 42 (expressao_l -> expressao_l GREATER_OR_EQUAL expressao_r .)
+    GREATER_OR_EQUAL reduce using rule 42 (expressao_l -> expressao_l GREATER_OR_EQUAL expressao_r .)
+    EQUAL_EQUAL     reduce using rule 42 (expressao_l -> expressao_l GREATER_OR_EQUAL expressao_r .)
+    NOT_EQUAL       reduce using rule 42 (expressao_l -> expressao_l GREATER_OR_EQUAL expressao_r .)
+    RIGHT_PARENTHESIS reduce using rule 42 (expressao_l -> expressao_l GREATER_OR_EQUAL expressao_r .)
+    AND             reduce using rule 42 (expressao_l -> expressao_l GREATER_OR_EQUAL expressao_r .)
+    OR              reduce using rule 42 (expressao_l -> expressao_l GREATER_OR_EQUAL expressao_r .)
+    SEMI_COLON      reduce using rule 42 (expressao_l -> expressao_l GREATER_OR_EQUAL expressao_r .)
+    RIGHT_SQUARE    reduce using rule 42 (expressao_l -> expressao_l GREATER_OR_EQUAL expressao_r .)
+    COMMA           reduce using rule 42 (expressao_l -> expressao_l GREATER_OR_EQUAL expressao_r .)
+    PLUS            shift and go to state 113
+    MINUS           shift and go to state 114
+
+
+state 136
+
+    (43) expressao_l -> expressao_l EQUAL_EQUAL expressao_r .
+    (46) expressao_r -> expressao_r . PLUS expressao_y
+    (47) expressao_r -> expressao_r . MINUS expressao_y
+
+    LESS_THAN       reduce using rule 43 (expressao_l -> expressao_l EQUAL_EQUAL expressao_r .)
+    LESS_OR_EQUAL   reduce using rule 43 (expressao_l -> expressao_l EQUAL_EQUAL expressao_r .)
+    GREATER_THAN    reduce using rule 43 (expressao_l -> expressao_l EQUAL_EQUAL expressao_r .)
+    GREATER_OR_EQUAL reduce using rule 43 (expressao_l -> expressao_l EQUAL_EQUAL expressao_r .)
+    EQUAL_EQUAL     reduce using rule 43 (expressao_l -> expressao_l EQUAL_EQUAL expressao_r .)
+    NOT_EQUAL       reduce using rule 43 (expressao_l -> expressao_l EQUAL_EQUAL expressao_r .)
+    RIGHT_PARENTHESIS reduce using rule 43 (expressao_l -> expressao_l EQUAL_EQUAL expressao_r .)
+    AND             reduce using rule 43 (expressao_l -> expressao_l EQUAL_EQUAL expressao_r .)
+    OR              reduce using rule 43 (expressao_l -> expressao_l EQUAL_EQUAL expressao_r .)
+    SEMI_COLON      reduce using rule 43 (expressao_l -> expressao_l EQUAL_EQUAL expressao_r .)
+    RIGHT_SQUARE    reduce using rule 43 (expressao_l -> expressao_l EQUAL_EQUAL expressao_r .)
+    COMMA           reduce using rule 43 (expressao_l -> expressao_l EQUAL_EQUAL expressao_r .)
+    PLUS            shift and go to state 113
+    MINUS           shift and go to state 114
+
+
+state 137
+
+    (44) expressao_l -> expressao_l NOT_EQUAL expressao_r .
+    (46) expressao_r -> expressao_r . PLUS expressao_y
+    (47) expressao_r -> expressao_r . MINUS expressao_y
+
+    LESS_THAN       reduce using rule 44 (expressao_l -> expressao_l NOT_EQUAL expressao_r .)
+    LESS_OR_EQUAL   reduce using rule 44 (expressao_l -> expressao_l NOT_EQUAL expressao_r .)
+    GREATER_THAN    reduce using rule 44 (expressao_l -> expressao_l NOT_EQUAL expressao_r .)
+    GREATER_OR_EQUAL reduce using rule 44 (expressao_l -> expressao_l NOT_EQUAL expressao_r .)
+    EQUAL_EQUAL     reduce using rule 44 (expressao_l -> expressao_l NOT_EQUAL expressao_r .)
+    NOT_EQUAL       reduce using rule 44 (expressao_l -> expressao_l NOT_EQUAL expressao_r .)
+    RIGHT_PARENTHESIS reduce using rule 44 (expressao_l -> expressao_l NOT_EQUAL expressao_r .)
+    AND             reduce using rule 44 (expressao_l -> expressao_l NOT_EQUAL expressao_r .)
+    OR              reduce using rule 44 (expressao_l -> expressao_l NOT_EQUAL expressao_r .)
+    SEMI_COLON      reduce using rule 44 (expressao_l -> expressao_l NOT_EQUAL expressao_r .)
+    RIGHT_SQUARE    reduce using rule 44 (expressao_l -> expressao_l NOT_EQUAL expressao_r .)
+    COMMA           reduce using rule 44 (expressao_l -> expressao_l NOT_EQUAL expressao_r .)
+    PLUS            shift and go to state 113
+    MINUS           shift and go to state 114
+
+
+state 138
+
+    (46) expressao_r -> expressao_r PLUS expressao_y .
+    (49) expressao_y -> expressao_y . TIMES expressao_f
+    (50) expressao_y -> expressao_y . DIVIDE expressao_f
+
+    PLUS            reduce using rule 46 (expressao_r -> expressao_r PLUS expressao_y .)
+    MINUS           reduce using rule 46 (expressao_r -> expressao_r PLUS expressao_y .)
+    LESS_THAN       reduce using rule 46 (expressao_r -> expressao_r PLUS expressao_y .)
+    LESS_OR_EQUAL   reduce using rule 46 (expressao_r -> expressao_r PLUS expressao_y .)
+    GREATER_THAN    reduce using rule 46 (expressao_r -> expressao_r PLUS expressao_y .)
+    GREATER_OR_EQUAL reduce using rule 46 (expressao_r -> expressao_r PLUS expressao_y .)
+    EQUAL_EQUAL     reduce using rule 46 (expressao_r -> expressao_r PLUS expressao_y .)
+    NOT_EQUAL       reduce using rule 46 (expressao_r -> expressao_r PLUS expressao_y .)
+    RIGHT_PARENTHESIS reduce using rule 46 (expressao_r -> expressao_r PLUS expressao_y .)
+    AND             reduce using rule 46 (expressao_r -> expressao_r PLUS expressao_y .)
+    OR              reduce using rule 46 (expressao_r -> expressao_r PLUS expressao_y .)
+    SEMI_COLON      reduce using rule 46 (expressao_r -> expressao_r PLUS expressao_y .)
+    RIGHT_SQUARE    reduce using rule 46 (expressao_r -> expressao_r PLUS expressao_y .)
+    COMMA           reduce using rule 46 (expressao_r -> expressao_r PLUS expressao_y .)
+    TIMES           shift and go to state 115
+    DIVIDE          shift and go to state 116
+
+
+state 139
+
+    (47) expressao_r -> expressao_r MINUS expressao_y .
+    (49) expressao_y -> expressao_y . TIMES expressao_f
+    (50) expressao_y -> expressao_y . DIVIDE expressao_f
+
+    PLUS            reduce using rule 47 (expressao_r -> expressao_r MINUS expressao_y .)
+    MINUS           reduce using rule 47 (expressao_r -> expressao_r MINUS expressao_y .)
+    LESS_THAN       reduce using rule 47 (expressao_r -> expressao_r MINUS expressao_y .)
+    LESS_OR_EQUAL   reduce using rule 47 (expressao_r -> expressao_r MINUS expressao_y .)
+    GREATER_THAN    reduce using rule 47 (expressao_r -> expressao_r MINUS expressao_y .)
+    GREATER_OR_EQUAL reduce using rule 47 (expressao_r -> expressao_r MINUS expressao_y .)
+    EQUAL_EQUAL     reduce using rule 47 (expressao_r -> expressao_r MINUS expressao_y .)
+    NOT_EQUAL       reduce using rule 47 (expressao_r -> expressao_r MINUS expressao_y .)
+    RIGHT_PARENTHESIS reduce using rule 47 (expressao_r -> expressao_r MINUS expressao_y .)
+    AND             reduce using rule 47 (expressao_r -> expressao_r MINUS expressao_y .)
+    OR              reduce using rule 47 (expressao_r -> expressao_r MINUS expressao_y .)
+    SEMI_COLON      reduce using rule 47 (expressao_r -> expressao_r MINUS expressao_y .)
+    RIGHT_SQUARE    reduce using rule 47 (expressao_r -> expressao_r MINUS expressao_y .)
+    COMMA           reduce using rule 47 (expressao_r -> expressao_r MINUS expressao_y .)
+    TIMES           shift and go to state 115
+    DIVIDE          shift and go to state 116
+
+
+state 140
+
+    (49) expressao_y -> expressao_y TIMES expressao_f .
+
+    TIMES           reduce using rule 49 (expressao_y -> expressao_y TIMES expressao_f .)
+    DIVIDE          reduce using rule 49 (expressao_y -> expressao_y TIMES expressao_f .)
+    PLUS            reduce using rule 49 (expressao_y -> expressao_y TIMES expressao_f .)
+    MINUS           reduce using rule 49 (expressao_y -> expressao_y TIMES expressao_f .)
+    LESS_THAN       reduce using rule 49 (expressao_y -> expressao_y TIMES expressao_f .)
+    LESS_OR_EQUAL   reduce using rule 49 (expressao_y -> expressao_y TIMES expressao_f .)
+    GREATER_THAN    reduce using rule 49 (expressao_y -> expressao_y TIMES expressao_f .)
+    GREATER_OR_EQUAL reduce using rule 49 (expressao_y -> expressao_y TIMES expressao_f .)
+    EQUAL_EQUAL     reduce using rule 49 (expressao_y -> expressao_y TIMES expressao_f .)
+    NOT_EQUAL       reduce using rule 49 (expressao_y -> expressao_y TIMES expressao_f .)
+    RIGHT_PARENTHESIS reduce using rule 49 (expressao_y -> expressao_y TIMES expressao_f .)
+    AND             reduce using rule 49 (expressao_y -> expressao_y TIMES expressao_f .)
+    OR              reduce using rule 49 (expressao_y -> expressao_y TIMES expressao_f .)
+    SEMI_COLON      reduce using rule 49 (expressao_y -> expressao_y TIMES expressao_f .)
+    RIGHT_SQUARE    reduce using rule 49 (expressao_y -> expressao_y TIMES expressao_f .)
+    COMMA           reduce using rule 49 (expressao_y -> expressao_y TIMES expressao_f .)
+
+
+state 141
+
+    (50) expressao_y -> expressao_y DIVIDE expressao_f .
+
+    TIMES           reduce using rule 50 (expressao_y -> expressao_y DIVIDE expressao_f .)
+    DIVIDE          reduce using rule 50 (expressao_y -> expressao_y DIVIDE expressao_f .)
+    PLUS            reduce using rule 50 (expressao_y -> expressao_y DIVIDE expressao_f .)
+    MINUS           reduce using rule 50 (expressao_y -> expressao_y DIVIDE expressao_f .)
+    LESS_THAN       reduce using rule 50 (expressao_y -> expressao_y DIVIDE expressao_f .)
+    LESS_OR_EQUAL   reduce using rule 50 (expressao_y -> expressao_y DIVIDE expressao_f .)
+    GREATER_THAN    reduce using rule 50 (expressao_y -> expressao_y DIVIDE expressao_f .)
+    GREATER_OR_EQUAL reduce using rule 50 (expressao_y -> expressao_y DIVIDE expressao_f .)
+    EQUAL_EQUAL     reduce using rule 50 (expressao_y -> expressao_y DIVIDE expressao_f .)
+    NOT_EQUAL       reduce using rule 50 (expressao_y -> expressao_y DIVIDE expressao_f .)
+    RIGHT_PARENTHESIS reduce using rule 50 (expressao_y -> expressao_y DIVIDE expressao_f .)
+    AND             reduce using rule 50 (expressao_y -> expressao_y DIVIDE expressao_f .)
+    OR              reduce using rule 50 (expressao_y -> expressao_y DIVIDE expressao_f .)
+    SEMI_COLON      reduce using rule 50 (expressao_y -> expressao_y DIVIDE expressao_f .)
+    RIGHT_SQUARE    reduce using rule 50 (expressao_y -> expressao_y DIVIDE expressao_f .)
+    COMMA           reduce using rule 50 (expressao_y -> expressao_y DIVIDE expressao_f .)
+
+
+state 142
+
+    (58) expressao_f -> IDU LEFT_PARENTHESIS lista_expressoes . RIGHT_PARENTHESIS
+    (66) lista_expressoes -> lista_expressoes . COMMA expressao
+
+    RIGHT_PARENTHESIS shift and go to state 147
+    COMMA           shift and go to state 148
+
+
+state 143
+
+    (67) lista_expressoes -> expressao .
+    (36) expressao -> expressao . AND expressao_l
+    (37) expressao -> expressao . OR expressao_l
+
+    RIGHT_PARENTHESIS reduce using rule 67 (lista_expressoes -> expressao .)
+    COMMA           reduce using rule 67 (lista_expressoes -> expressao .)
+    AND             shift and go to state 105
+    OR              shift and go to state 106
+
+
+state 144
+
+    (30) comando -> WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .
+
+    RIGHT_BRACES    reduce using rule 30 (comando -> WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
+    IF              reduce using rule 30 (comando -> WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
+    WHILE           reduce using rule 30 (comando -> WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
+    DO              reduce using rule 30 (comando -> WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
+    BREAK           reduce using rule 30 (comando -> WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
+    CONTINUE        reduce using rule 30 (comando -> WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
+    LEFT_BRACES     reduce using rule 30 (comando -> WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
+    IDU             reduce using rule 30 (comando -> WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
+    ELSE            reduce using rule 30 (comando -> WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
+
+
+state 145
+
+    (31) comando -> DO comando WHILE LEFT_PARENTHESIS expressao . RIGHT_PARENTHESIS SEMI_COLON
+    (36) expressao -> expressao . AND expressao_l
+    (37) expressao -> expressao . OR expressao_l
+
+    RIGHT_PARENTHESIS shift and go to state 149
+    AND             shift and go to state 105
+    OR              shift and go to state 106
+
+
+state 146
+
+    (29) comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE . comando
+    (28) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    (29) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE comando
+    (30) comando -> . WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    (31) comando -> . DO comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
+    (32) comando -> . bloco
+    (33) comando -> . valor_esquerdo EQUALS expressao SEMI_COLON
+    (34) comando -> . BREAK SEMI_COLON
+    (35) comando -> . CONTINUE SEMI_COLON
+    (20) bloco -> . LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    IF              shift and go to state 63
+    WHILE           shift and go to state 64
+    DO              shift and go to state 65
+    BREAK           shift and go to state 68
+    CONTINUE        shift and go to state 69
+    LEFT_BRACES     shift and go to state 53
+    IDU             shift and go to state 70
+
+    comando                        shift and go to state 150
+    bloco                          shift and go to state 66
+    valor_esquerdo                 shift and go to state 67
+
+state 147
+
+    (58) expressao_f -> IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS .
+
+    TIMES           reduce using rule 58 (expressao_f -> IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS .)
+    DIVIDE          reduce using rule 58 (expressao_f -> IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS .)
+    PLUS            reduce using rule 58 (expressao_f -> IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS .)
+    MINUS           reduce using rule 58 (expressao_f -> IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS .)
+    LESS_THAN       reduce using rule 58 (expressao_f -> IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS .)
+    LESS_OR_EQUAL   reduce using rule 58 (expressao_f -> IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS .)
+    GREATER_THAN    reduce using rule 58 (expressao_f -> IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS .)
+    GREATER_OR_EQUAL reduce using rule 58 (expressao_f -> IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS .)
+    EQUAL_EQUAL     reduce using rule 58 (expressao_f -> IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS .)
+    NOT_EQUAL       reduce using rule 58 (expressao_f -> IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS .)
+    RIGHT_PARENTHESIS reduce using rule 58 (expressao_f -> IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS .)
+    AND             reduce using rule 58 (expressao_f -> IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS .)
+    OR              reduce using rule 58 (expressao_f -> IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS .)
+    SEMI_COLON      reduce using rule 58 (expressao_f -> IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS .)
+    RIGHT_SQUARE    reduce using rule 58 (expressao_f -> IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS .)
+    COMMA           reduce using rule 58 (expressao_f -> IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS .)
+
+
+state 148
+
+    (66) lista_expressoes -> lista_expressoes COMMA . expressao
+    (36) expressao -> . expressao AND expressao_l
+    (37) expressao -> . expressao OR expressao_l
+    (38) expressao -> . expressao_l
+    (39) expressao_l -> . expressao_l LESS_THAN expressao_r
+    (40) expressao_l -> . expressao_l LESS_OR_EQUAL expressao_r
+    (41) expressao_l -> . expressao_l GREATER_THAN expressao_r
+    (42) expressao_l -> . expressao_l GREATER_OR_EQUAL expressao_r
+    (43) expressao_l -> . expressao_l EQUAL_EQUAL expressao_r
+    (44) expressao_l -> . expressao_l NOT_EQUAL expressao_r
+    (45) expressao_l -> . expressao_r
+    (46) expressao_r -> . expressao_r PLUS expressao_y
+    (47) expressao_r -> . expressao_r MINUS expressao_y
+    (48) expressao_r -> . expressao_y
+    (49) expressao_y -> . expressao_y TIMES expressao_f
+    (50) expressao_y -> . expressao_y DIVIDE expressao_f
+    (51) expressao_y -> . expressao_f
+    (52) expressao_f -> . valor_esquerdo
+    (53) expressao_f -> . PLUS_PLUS valor_esquerdo
+    (54) expressao_f -> . MINUS_MINUS valor_esquerdo
+    (55) expressao_f -> . valor_esquerdo PLUS_PLUS
+    (56) expressao_f -> . valor_esquerdo MINUS_MINUS
+    (57) expressao_f -> . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
+    (58) expressao_f -> . IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+    (59) expressao_f -> . MINUS expressao_f
+    (60) expressao_f -> . NOT expressao_f
+    (61) expressao_f -> . TRUE
+    (62) expressao_f -> . FALSE
+    (63) expressao_f -> . CHARACTER
+    (64) expressao_f -> . STRINGVAL
+    (65) expressao_f -> . NUMERAL
+    (68) valor_esquerdo -> . valor_esquerdo DOT IDU
+    (69) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (70) valor_esquerdo -> . IDU
+
+    PLUS_PLUS       shift and go to state 89
+    MINUS_MINUS     shift and go to state 90
+    LEFT_PARENTHESIS shift and go to state 81
+    IDU             shift and go to state 91
+    MINUS           shift and go to state 86
+    NOT             shift and go to state 92
+    TRUE            shift and go to state 93
+    FALSE           shift and go to state 94
+    CHARACTER       shift and go to state 95
+    STRINGVAL       shift and go to state 96
+    NUMERAL         shift and go to state 97
+
+    expressao                      shift and go to state 151
+    expressao_l                    shift and go to state 83
+    expressao_r                    shift and go to state 84
+    expressao_y                    shift and go to state 85
+    expressao_f                    shift and go to state 87
+    valor_esquerdo                 shift and go to state 88
+
+state 149
+
+    (31) comando -> DO comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS . SEMI_COLON
+
+    SEMI_COLON      shift and go to state 152
+
+
+state 150
+
+    (29) comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE comando .
+
+    RIGHT_BRACES    reduce using rule 29 (comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE comando .)
+    IF              reduce using rule 29 (comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE comando .)
+    WHILE           reduce using rule 29 (comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE comando .)
+    DO              reduce using rule 29 (comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE comando .)
+    BREAK           reduce using rule 29 (comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE comando .)
+    CONTINUE        reduce using rule 29 (comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE comando .)
+    LEFT_BRACES     reduce using rule 29 (comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE comando .)
+    IDU             reduce using rule 29 (comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE comando .)
+    ELSE            reduce using rule 29 (comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE comando .)
+
+
+state 151
+
+    (66) lista_expressoes -> lista_expressoes COMMA expressao .
+    (36) expressao -> expressao . AND expressao_l
+    (37) expressao -> expressao . OR expressao_l
+
+    RIGHT_PARENTHESIS reduce using rule 66 (lista_expressoes -> lista_expressoes COMMA expressao .)
+    COMMA           reduce using rule 66 (lista_expressoes -> lista_expressoes COMMA expressao .)
+    AND             shift and go to state 105
+    OR              shift and go to state 106
+
+
+state 152
+
+    (31) comando -> DO comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON .
+
+    RIGHT_BRACES    reduce using rule 31 (comando -> DO comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON .)
+    IF              reduce using rule 31 (comando -> DO comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON .)
+    WHILE           reduce using rule 31 (comando -> DO comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON .)
+    DO              reduce using rule 31 (comando -> DO comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON .)
+    BREAK           reduce using rule 31 (comando -> DO comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON .)
+    CONTINUE        reduce using rule 31 (comando -> DO comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON .)
+    LEFT_BRACES     reduce using rule 31 (comando -> DO comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON .)
+    IDU             reduce using rule 31 (comando -> DO comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON .)
+    ELSE            reduce using rule 31 (comando -> DO comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON .)
+
