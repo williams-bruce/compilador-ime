@@ -71,11 +71,10 @@ class Lexer:
         ('OR',              r'\|\|'),
 
         # --- Literals and Identifiers ---
-        ('STRING',          r'"(?:\\.|[^"\\])*"'),  # Handles escaped quotes
+        ('STRINGVAL',       r'"(?:\\.|[^"\\])*"'),  # Handles escaped quotes
         ('CHARACTER',       r"'(.)'"),
         ('NUMERAL',         r'\d+'),
-        ('IDD',              r'[a-zA-Z_][a-zA-Z0-9_]*'),
-        ('IDU',              r'[a-zA-Z_][a-zA-Z0-9_]*'),
+        ('ID',              r'[a-zA-Z_][a-zA-Z0-9_]*'),
 
         # --- Single-character symbols ---
         ('PLUS',            r'\+'),
@@ -138,16 +137,16 @@ class Lexer:
             token_type = TokenType[token_type_name]
             secondary_token: int|None = None
 
-            if token_type == TokenType.IDD or token_type == TokenType.IDU:
+            if token_type == TokenType.ID:
                 # Check if the identifier is a keyword
-                token_type = KEYWORDS.get(lexeme, TokenType.IDD)
-                if token_type == TokenType.IDD or token_type == TokenType.IDU:
+                token_type = KEYWORDS.get(lexeme, TokenType.ID)
+                if token_type == TokenType.ID:
                     secondary_token = self.symbol_table.lookup_or_add_identifier(lexeme)
 
-            elif token_type in (TokenType.NUMERAL, TokenType.STRING, TokenType.CHARACTER):
+            elif token_type in (TokenType.NUMERAL, TokenType.STRINGVAL, TokenType.CHARACTER):
                 # For string and char, store the value without quotes
                 value_to_store = lexeme
-                if token_type in (TokenType.STRING, TokenType.CHARACTER):
+                if token_type in (TokenType.STRINGVAL, TokenType.CHARACTER):
                     value_to_store = lexeme[1:-1]
                 secondary_token = self.symbol_table.add_constant(value_to_store)
 

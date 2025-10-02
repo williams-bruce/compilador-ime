@@ -1,1 +1,5 @@
 type idade = array[10] of integer
+var myBool: boolean;
+myBool = true
+var myString: string;
+myString = "hello, world"

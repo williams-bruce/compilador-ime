@@ -22,7 +22,7 @@ tokens = (
     'TIMES', 'DOT', 'DIVIDE', 'EQUALS', 'LESS_THAN', 'GREATER_THAN', 'NOT',
     'PLUS_PLUS', 'MINUS_MINUS', 'EQUAL_EQUAL', 'AND', 'OR',
     'LESS_OR_EQUAL', 'GREATER_OR_EQUAL', 'NOT_EQUAL',
-    'CHARACTER', 'NUMERAL', 'STRINGVAL', 'IDD', 'IDU',
+    'CHARACTER', 'NUMERAL', 'STRINGVAL', 'ID'
 )
 
 
@@ -102,14 +102,14 @@ def p_tipo(p):
              | CHAR
              | BOOLEAN
              | STRING
-             | IDU"""
+             | idu"""
     p[0] = ('tipo', p[1])
 
 
 def p_declaracao_tipo(p):
-    """declaracao_tipo : TYPE IDD EQUALS ARRAY LEFT_SQUARE NUMERAL RIGHT_SQUARE OF tipo
-                        | TYPE IDD EQUALS STRUCT LEFT_BRACES declaracao_campos RIGHT_BRACES
-                        | TYPE IDD EQUALS tipo"""
+    """declaracao_tipo : TYPE idd EQUALS ARRAY LEFT_SQUARE NUMERAL RIGHT_SQUARE OF tipo
+                        | TYPE idd EQUALS STRUCT new_block LEFT_BRACES declaracao_campos RIGHT_BRACES
+                        | TYPE idd EQUALS tipo"""
     p[0] = ('decl_tipo',) + tuple(p[1:])
 
 
@@ -120,13 +120,18 @@ def p_declaracao_campos(p):
 
 
 def p_declaracao_funcao(p):
-    """declaracao_funcao : FUNCTION IDD LEFT_PARENTHESIS lista_parametros RIGHT_PARENTHESIS COLON tipo bloco"""
+    """declaracao_funcao : FUNCTION idd new_block LEFT_PARENTHESIS lista_parametros RIGHT_PARENTHESIS COLON tipo bloco"""
     p[0] = ('funcao',) + tuple(p[1:])
 
 
+def p_new_block(p):
+    """new_block : """
+    p[0] = ('new_block',)
+
+
 def p_lista_parametros(p):
-    """lista_parametros : lista_parametros COMMA IDD COLON tipo
-                         | IDD COLON tipo"""
+    """lista_parametros : lista_parametros COMMA idd COLON tipo
+                         | idd COLON tipo"""
     if len(p) == 4:
         p[0] = [(p[1], p[3])]
     else:
@@ -165,8 +170,8 @@ def p_declaracao_variavel(p):
 
 
 def p_lista_identificadores(p):
-    """lista_identificadores : lista_identificadores COMMA IDD
-                              | IDD"""
+    """lista_identificadores : lista_identificadores COMMA idd
+                              | idd"""
     if len(p) == 2:
         p[0] = [p[1]]
     else:
@@ -225,14 +230,14 @@ def p_expressao_f(p):
                     | valor_esquerdo PLUS_PLUS
                     | valor_esquerdo MINUS_MINUS
                     | LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
-                    | IDU LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+                    | idu LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
                     | MINUS expressao_f %prec UMINUS
                     | NOT expressao_f
-                    | TRUE
-                    | FALSE
-                    | CHARACTER
-                    | STRINGVAL
-                    | NUMERAL"""
+                    | true
+                    | false
+                    | chr
+                    | str
+                    | num"""
     p[0] = ('expr_f',) + tuple(p[1:])
 
 
@@ -247,15 +252,55 @@ def p_lista_expressoes(p):
 
 
 def p_valor_esquerdo(p):
-    """valor_esquerdo : valor_esquerdo DOT IDU
+    """valor_esquerdo : valor_esquerdo DOT id
                        | valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
-                       | IDU"""
+                       | idu"""
     if len(p) == 2:
         p[0] = ('lval_id', p[1])
     elif p[2] == '.':
         p[0] = ('lval_field', p[1], p[3])
     else:
         p[0] = ('lval_index', p[1], p[3])
+
+
+def p_idd(p):
+    """idd : ID"""
+    p[0] = p[1]
+
+
+def p_idu(p):
+    """idu : ID"""
+    p[0] = p[1]
+
+
+def p_id(p):
+    """id : ID"""
+    p[0] = p[1]
+
+
+def p_true(p):
+    """true : TRUE"""
+    p[0] = ('true',)
+
+
+def p_false(p):
+    """false : FALSE"""
+    p[0] = ('false',)
+
+
+def p_chr(p):
+    """chr : CHARACTER"""
+    p[0] = ('chr',)
+
+
+def p_str(p):
+    """str : STRINGVAL"""
+    p[0] = ('str',)
+
+
+def p_num(p):
+    """num : NUMERAL"""
+    p[0] = ('num',)
 
 
 def p_error(p):

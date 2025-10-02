@@ -8,7 +8,7 @@ class TokenType(Enum):
     """Enumeration for all token types."""
 
     # Palavras reservadas
-    ARRAY = auto()
+    ARRAY = 0
     BOOLEAN = auto()
     BREAK = auto()
     CHAR = auto()
@@ -61,8 +61,7 @@ class TokenType(Enum):
     CHARACTER = auto()
     NUMERAL = auto()
     STRINGVAL = auto()
-    IDD = auto()
-    IDU = auto()
+    ID = auto()
 
     # Tokens desconhecidos
     EOF = auto()
