@@ -1,15 +1,11 @@
-
-
-
-class Object:
-    nName = None
-    pNext = None
+from typing import Optional
+from object import Object
 
 
 class ScopeManager:
     def __init__(self):
-        self.symbol_table: list[Object | None] = []
-        self.symbol_table_last: list[Object | None] = []
+        self.symbol_table: list[Optional[Object]] = []
+        self.symbol_table_last: list[Optional[Object]] = []
         self.current_level: int = -1
 
 
@@ -26,7 +22,7 @@ class ScopeManager:
 
 
     def define(self, aName: int) -> Object:
-        obj: Object | None = Object(aName, None)
+        obj: Optional[Object] = Object(aName, None, None, None)
         
         if self.symbol_table[self.current_level] is None:
             self.symbol_table[self.current_level] = obj
@@ -39,8 +35,8 @@ class ScopeManager:
         return obj
 
 
-    def search(self, aName: int) -> Object | None:
-        obj: Object | None = self.symbol_table[self.current_level]
+    def search(self, aName: int) -> Optional[Object]:
+        obj: Optional[Object] = self.symbol_table[self.current_level]
         
         while obj is not None:
             if obj.nName == aName:
@@ -50,8 +46,8 @@ class ScopeManager:
         return obj
 
 
-    def find(self, aName: int) -> Object | None:
-        obj: Object | None = None
+    def find(self, aName: int) -> Optional[Object]:
+        obj: Optional[Object] = None
         i: int = self.current_level
         
         while i >= 0:

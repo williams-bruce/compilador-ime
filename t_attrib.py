@@ -1,12 +1,13 @@
+from __future__ import annotations
 from t_nont import T_nont
 from dataclasses import dataclass
-from scope_manager import Object
+from object import Object
 
 
 @dataclass
 class T_attrib:
     t_nont: T_nont
-    attrib: any
+    attrib: PROGRAMA | LISTA_DECLARACOES_EXTERNAS | DECLARACAO_EXTERNA | TIPO | DECLARACAO_TIPO | DECLARACAO_CAMPOS | DECLARACAO_FUNCAO | LISTA_PARAMETROS | BLOCO | LISTA_DECLARACAO_VARIAVEIS | LISTA_COMANDOS | DECLARACAO_VARIAVEL | LISTA_IDENTIFICADORES | COMANDO | EXPRESSAO | EXPRESSAO_L | EXPRESSAO_R | EXPRESSAO_Y | EXPRESSAO_F | LISTA_EXPRESSOES | VALOR_ESQUERDO | IDD | IDU | ID | TRUE | FALSE | CHR | STR | NUM
 
 
 @dataclass
@@ -26,17 +27,17 @@ class DECLARACAO_EXTERNA:
 
 @dataclass
 class TIPO:
-    pass
+    type: Object
 
 
 @dataclass
 class DECLARACAO_TIPO:
-    pass
+    obj: Object
 
 
 @dataclass
 class DECLARACAO_CAMPOS:
-    pass
+    list: Object
 
 
 @dataclass
@@ -66,12 +67,12 @@ class LISTA_COMANDOS:
 
 @dataclass
 class DECLARACAO_VARIAVEL:
-    pass
+    list: Object
 
 
 @dataclass
 class LISTA_IDENTIFICADORES:
-    pass
+    list: Object
 
 
 @dataclass
@@ -134,24 +135,32 @@ class ID:
 
 @dataclass
 class TRUE:
-    pass
+    type: Object
+    val: bool
 
 
 @dataclass
 class FALSE:
-    pass
+    type: Object
+    val: bool
 
 
 @dataclass
 class CHR:
-    pass
+    type: Object
+    pos: int
+    val: str
 
 
 @dataclass
 class STR:
-    pass
+    type: Object
+    pos: int
+    val: str
 
 
 @dataclass
 class NUM:
-    pass
+    type: Object
+    pos: int
+    val: int

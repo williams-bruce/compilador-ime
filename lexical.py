@@ -31,6 +31,11 @@ class SymbolTable:
         return self._const_map[value]
 
 
+    def get_constant(self, index: int) -> str:
+        """Returns the constant value for a given index."""
+        return self.constants[index]
+
+
     def __str__(self) -> str:
         """Provides a formatted string of the symbol table's contents."""
         report = []

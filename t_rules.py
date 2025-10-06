@@ -3,7 +3,7 @@ from enum import Enum, auto
 
 class T_rule(Enum):
     START = 0                                   # 0    S' -> programa
-    PROGRAMA = auto()                           # 1   programa -> lista_declaracoes_externas
+    PROGRAMA = auto()                           # 1    programa -> lista_declaracoes_externas
     LISTA_DECLARACOES_EXTERNAS = auto()         # 2    lista_declaracoes_externas -> declaracao_externa
     LISTA_DECLARACOES_EXTERNAS_REC = auto()     # 3    lista_declaracoes_externas -> lista_declaracoes_externas declaracao_externa
     DECLARACAO_EXTERNA_TIPO = auto()            # 4    declaracao_externa -> declaracao_tipo
@@ -14,7 +14,7 @@ class T_rule(Enum):
     TIPO_BOOLEAN = auto()                       # 9    tipo -> BOOLEAN
     TIPO_STRING = auto()                        # 10   tipo -> STRING
     TIPO_IDU = auto()                           # 11   tipo -> idu
-    DECLARACAO_TIPO_ARRAY = auto()              # 12   declaracao_tipo -> TYPE idd EQUALS ARRAY LEFT_SQUARE NUMERAL RIGHT_SQUARE OF tipo
+    DECLARACAO_TIPO_ARRAY = auto()              # 12   declaracao_tipo -> TYPE idd EQUALS ARRAY LEFT_SQUARE num RIGHT_SQUARE OF tipo
     DECLARACAO_TIPO_STRUCT = auto()             # 13   declaracao_tipo -> TYPE idd EQUALS STRUCT new_block LEFT_BRACES declaracao_campos RIGHT_BRACES
     DECLARACAO_TIPO = auto()                    # 14   declaracao_tipo -> TYPE idd EQUALS tipo
     DECLARACAO_CAMPOS_REC = auto()              # 15   declaracao_campos -> declaracao_campos SEMI_COLON lista_identificadores COLON tipo

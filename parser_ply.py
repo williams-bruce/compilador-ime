@@ -107,7 +107,7 @@ def p_tipo(p):
 
 
 def p_declaracao_tipo(p):
-    """declaracao_tipo : TYPE idd EQUALS ARRAY LEFT_SQUARE NUMERAL RIGHT_SQUARE OF tipo
+    """declaracao_tipo : TYPE idd EQUALS ARRAY LEFT_SQUARE num RIGHT_SQUARE OF tipo
                         | TYPE idd EQUALS STRUCT new_block LEFT_BRACES declaracao_campos RIGHT_BRACES
                         | TYPE idd EQUALS tipo"""
     p[0] = ('decl_tipo',) + tuple(p[1:])
@@ -184,7 +184,7 @@ def p_comando(p):
                 | IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE comando
                 | WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
                 | DO comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
-                | bloco
+                | new_block bloco
                 | valor_esquerdo EQUALS expressao SEMI_COLON
                 | BREAK SEMI_COLON
                 | CONTINUE SEMI_COLON"""
