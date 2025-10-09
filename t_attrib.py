@@ -42,12 +42,19 @@ class DECLARACAO_CAMPOS:
 
 @dataclass
 class DECLARACAO_FUNCAO:
-    pass
+    obj: Object
+
+
+@dataclass
+class MARCADOR_C:
+    type: Object
+    param: Object
+    err: bool
 
 
 @dataclass
 class LISTA_PARAMETROS:
-    pass
+    list: Object
 
 
 @dataclass
@@ -82,37 +89,39 @@ class COMANDO:
 
 @dataclass
 class EXPRESSAO:
-    pass
+    type: Object
 
 
 @dataclass
 class EXPRESSAO_L:
-    pass
+    type: Object
 
 
 @dataclass
 class EXPRESSAO_R:
-    pass
+    type: Object
 
 
 @dataclass
 class EXPRESSAO_Y:
-    pass
+    type: Object
 
 
 @dataclass
 class EXPRESSAO_F:
-    pass
+    type: Object
 
 
 @dataclass
 class LISTA_EXPRESSOES:
-    pass
+    param: Object
+    err: bool
+    n: int
 
 
 @dataclass
 class VALOR_ESQUERDO:
-    pass
+    type: Object
 
 
 @dataclass

@@ -48,4 +48,3 @@ class Struct:
 @dataclass
 class Alias:
     pBaseType: Optional[Object] = None
-        

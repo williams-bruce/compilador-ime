@@ -10,6 +10,8 @@ class T_nont(Enum):
     DECLARACAO_CAMPOS_ = auto()
     DECLARACAO_FUNCAO_ = auto()
     NEW_BLOCK_ = auto()
+    MARCADOR_FUNCAO_ = auto()
+    MARCADOR_C = auto()
     LISTA_PARAMETROS_ = auto()
     BLOCO_ = auto()
     LISTA_DECLARACAO_VARIAVEIS_ = auto()

@@ -120,13 +120,23 @@ def p_declaracao_campos(p):
 
 
 def p_declaracao_funcao(p):
-    """declaracao_funcao : FUNCTION idd new_block LEFT_PARENTHESIS lista_parametros RIGHT_PARENTHESIS COLON tipo bloco"""
+    """declaracao_funcao : FUNCTION idd new_block LEFT_PARENTHESIS lista_parametros RIGHT_PARENTHESIS COLON tipo marcador_funcao bloco"""
     p[0] = ('funcao',) + tuple(p[1:])
 
 
 def p_new_block(p):
     """new_block : """
     p[0] = ('new_block',)
+
+
+def p_marcador_funcao(p):
+    """marcador_funcao : """
+    p[0] = ('marcador_funcao',)
+
+
+def p_marcador_c(p):
+    """marcador_c : """
+    p[0] = ('marcador_c',)
 
 
 def p_lista_parametros(p):
@@ -230,7 +240,7 @@ def p_expressao_f(p):
                     | valor_esquerdo PLUS_PLUS
                     | valor_esquerdo MINUS_MINUS
                     | LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS
-                    | idu LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+                    | idu marcador_c LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
                     | MINUS expressao_f %prec UMINUS
                     | NOT expressao_f
                     | true
