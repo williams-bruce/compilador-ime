@@ -2,12 +2,13 @@ from __future__ import annotations
 from t_nont import T_nont
 from dataclasses import dataclass
 from object import Object
+from typing import Optional
 
 
 @dataclass
 class T_attrib:
     t_nont: T_nont
-    attrib: PROGRAMA | LISTA_DECLARACOES_EXTERNAS | DECLARACAO_EXTERNA | TIPO | DECLARACAO_TIPO | DECLARACAO_CAMPOS | DECLARACAO_FUNCAO | LISTA_PARAMETROS | BLOCO | LISTA_DECLARACAO_VARIAVEIS | LISTA_COMANDOS | DECLARACAO_VARIAVEL | LISTA_IDENTIFICADORES | COMANDO | EXPRESSAO | EXPRESSAO_L | EXPRESSAO_R | EXPRESSAO_Y | EXPRESSAO_F | LISTA_EXPRESSOES | VALOR_ESQUERDO | IDD | IDU | ID | TRUE | FALSE | CHR | STR | NUM
+    attrib: PROGRAMA | LISTA_DECLARACOES_EXTERNAS | DECLARACAO_EXTERNA | TIPO | DECLARACAO_TIPO | DECLARACAO_CAMPOS | DECLARACAO_FUNCAO | MARCADOR_C | N_FUNCAO | MARCADOR_FUNCAO | LISTA_PARAMETROS | BLOCO | LISTA_DECLARACAO_VARIAVEIS | LISTA_COMANDOS | DECLARACAO_VARIAVEL | LISTA_IDENTIFICADORES| MT | ME | MW | COMANDO | EXPRESSAO | EXPRESSAO_L | EXPRESSAO_R | EXPRESSAO_Y | EXPRESSAO_F | LISTA_EXPRESSOES | VALOR_ESQUERDO | IDD | IDU | ID | TRUE | FALSE | CHR | STR | NUM
 
 
 @dataclass
@@ -28,6 +29,7 @@ class DECLARACAO_EXTERNA:
 @dataclass
 class TIPO:
     type: Object
+    nSize: int = 1
 
 
 @dataclass
@@ -38,11 +40,22 @@ class DECLARACAO_TIPO:
 @dataclass
 class DECLARACAO_CAMPOS:
     list: Object
+    nSize: int = 0
 
 
 @dataclass
 class DECLARACAO_FUNCAO:
     obj: Object
+
+
+@dataclass
+class MARCADOR_FUNCAO:
+    offset: int
+
+
+@dataclass
+class N_FUNCAO:
+    pass
 
 
 @dataclass
@@ -55,6 +68,7 @@ class MARCADOR_C:
 @dataclass
 class LISTA_PARAMETROS:
     list: Object
+    nSize: int = 0
 
 
 @dataclass
@@ -80,6 +94,21 @@ class DECLARACAO_VARIAVEL:
 @dataclass
 class LISTA_IDENTIFICADORES:
     list: Object
+
+
+@dataclass
+class MT:
+    label: int
+
+
+@dataclass
+class ME:
+    label: int
+
+
+@dataclass
+class MW:
+    label: int
 
 
 @dataclass

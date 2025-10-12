@@ -12,7 +12,6 @@ class SymbolTable:
         self.identifiers: Dict[str, int] = {}
         self._next_id_index: int = 0
         self.constants: List[str] = []
-        self._const_map: Dict[str, int] = {}
 
 
     def lookup_or_add_identifier(self, name: str) -> int:
@@ -25,10 +24,9 @@ class SymbolTable:
 
     def add_constant(self, value: str) -> int:
         """Adds a constant literal if new, returns its unique index."""
-        if value not in self._const_map:
-            self._const_map[value] = len(self.constants)
-            self.constants.append(value)
-        return self._const_map[value]
+        sec_token = len(self.constants)
+        self.constants.append(value)
+        return sec_token
 
 
     def get_constant(self, index: int) -> str:

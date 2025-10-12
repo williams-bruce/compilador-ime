@@ -20,6 +20,7 @@ class TokenType(Enum):
     IF = auto()
     INTEGER = auto()
     OF = auto()
+    RETURN = auto()
     STRING = auto()
     STRUCT = auto()
     TRUE = auto()
@@ -97,6 +98,7 @@ KEYWORDS = {
     "if": TokenType.IF,
     "integer": TokenType.INTEGER,
     "of": TokenType.OF,
+    "return": TokenType.RETURN,
     "string": TokenType.STRING, # Also a literal type, but "string" is a keyword for type declaration
     "struct": TokenType.STRUCT,
     "true": TokenType.TRUE,

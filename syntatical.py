@@ -3,9 +3,10 @@ import csv
 from t_attrib import T_attrib
 from t_attrib import IDD, IDU, ID, TIPO, LISTA_IDENTIFICADORES, DECLARACAO_VARIAVEL
 from t_attrib import TRUE, FALSE, CHR, STR, NUM, DECLARACAO_TIPO, DECLARACAO_CAMPOS
-from t_attrib import LISTA_PARAMETROS, DECLARACAO_FUNCAO, EXPRESSAO, EXPRESSAO_L
+from t_attrib import LISTA_PARAMETROS, EXPRESSAO, EXPRESSAO_L
 from t_attrib import EXPRESSAO_R, EXPRESSAO_Y, EXPRESSAO_F, VALOR_ESQUERDO
-from t_attrib import MARCADOR_C, LISTA_EXPRESSOES
+from t_attrib import MARCADOR_C, LISTA_EXPRESSOES, MARCADOR_FUNCAO
+from t_attrib import MT, ME, MW
 from t_rules import T_rule
 from scope_manager import ScopeManager
 from typing import Generator, Optional
@@ -13,10 +14,11 @@ from tokens import Token
 from t_nont import T_nont
 from object import Object, Var, Array, Alias, Field, Struct, Param, Function
 from t_kind import T_kind
+import os
 
 
 class SyntaticalAnalyzer:
-    def __init__(self, lexer: Lexer):
+    def __init__(self, lexer: Lexer, output_file_name: str = "output_ssl_compiled.txt"):
         self.lexer = lexer
         self.tokens: Generator[Token, None, None] = lexer.tokenize()
         self.stack: list[int] = []
@@ -24,15 +26,39 @@ class SyntaticalAnalyzer:
         with open("lr_goto_and_action_items.csv", "r") as file:
             reader = csv.reader(file)
             self._action = list(reader)
+        self.output_file = open(output_file_name, "w")
         
         self.len_rules, self.left_side_of_rules = self._get_rules_info()
         self.scope_manager = ScopeManager()
         
-        self.int_ : Object = Object(nName=-1, pNext=None, ekind=T_kind.SCALAR_TYPE_)
-        self.char_ : Object = Object(nName=-1, pNext=None, ekind=T_kind.SCALAR_TYPE_)
-        self.bool_ : Object = Object(nName=-1, pNext=None, ekind=T_kind.SCALAR_TYPE_)
-        self.string_ : Object = Object(nName=-1, pNext=None, ekind=T_kind.SCALAR_TYPE_)
-        self.universal_ : Object = Object(nName=-1, pNext=None, ekind=T_kind.UNIVERSAL_)
+        self.int_ : Object = Object(nName=-1, pNext=None, eKind=T_kind.SCALAR_TYPE_)
+        self.char_ : Object = Object(nName=-1, pNext=None, eKind=T_kind.SCALAR_TYPE_)
+        self.bool_ : Object = Object(nName=-1, pNext=None, eKind=T_kind.SCALAR_TYPE_)
+        self.string_ : Object = Object(nName=-1, pNext=None, eKind=T_kind.SCALAR_TYPE_)
+        self.universal_ : Object = Object(nName=-1, pNext=None, eKind=T_kind.UNIVERSAL_)
+        
+        self.n_funcs_index: int = 0
+        self._num_labels: int = 0
+        self.current_function: Object = None
+        self.error_flag: bool = False
+        
+        self.debug: bool = False
+    
+    
+    def _get_new_n_funcs_index(self):
+        n_funcs_index = self.n_funcs_index
+        self.n_funcs_index += 1
+        return n_funcs_index
+    
+    
+    def get_n_funcs_index(self):
+        return self.n_funcs_index
+    
+    
+    def _new_label(self):
+        label = f"L{self._num_labels}"
+        self._num_labels += 1
+        return label
 
 
     def push(self, item):
@@ -41,7 +67,7 @@ class SyntaticalAnalyzer:
                 item = int(item)
                 self.stack.append(item)
             except:
-                print(f"Pushing item: {item} to stack")
+                print(f"Pushing item: {"vazio" if len(item) == 0 else item} to stack")
         else:
             self.stack.append(item)
     
@@ -105,7 +131,11 @@ class SyntaticalAnalyzer:
             left_side_of_rules.append(left)
 
         for rule in right_side_of_rules:
-            len_rules.append(len(rule.strip().split(" ")))
+            rule_ = rule.strip().split(" ")
+            if rule_[0] == '<empty>':
+                len_rules.append(0)
+            else:
+                len_rules.append(len(rule_))
         
         return len_rules, left_side_of_rules
     
@@ -115,14 +145,14 @@ class SyntaticalAnalyzer:
             if word == token_type:
                 return i
         
-        print(f"Index not found for token type: {token_type}")
-        return -1
+        raise Exception(f"Index not found for token type: {token_type}")
 
 
     def action(self, q, a):
         index = self._find_index(a)
         state = self._action[q+1][index]
-        print(f"Action called with q = {q} and a = {a} -> state = {state}")
+        if self.debug:
+            print(f"Action called with q = {q} and a = {a} -> state = {state}")
         return state
     
     
@@ -132,7 +162,15 @@ class SyntaticalAnalyzer:
         self.current_token = self.next_token()
         
         while q != 1:
-            print(f'pilha: {self.stack}')
+            if self.current_token.type.name == 'ID':
+                self.current_id_token = self.current_token
+            
+            if self.current_token.type.name in ['NUMERAL', 'STRINGVAL', 'CHARACTER']:
+                self.current_const_token = self.current_token
+                
+            if self.debug:
+                print(f'pilha: {self.stack}')
+            
             tok_name = '$end' if self.current_token.type.name == 'EOF' else self.current_token.type.name
             p = self.action(q, tok_name)
             try:
@@ -145,7 +183,8 @@ class SyntaticalAnalyzer:
                 self.current_token = self.next_token()
             elif self.is_reduce(p):
                 r = self.rule(p)
-                print(f"Reducing rule: {r}")
+                if self.debug:
+                    print(f"Reducing rule: {r}")
                 self.pop(self.len_rules[r])
                 self.push(self.action(self.top(), self.left_side_of_rules[r]))
                 self.semantics(r)
@@ -153,13 +192,13 @@ class SyntaticalAnalyzer:
                 raise Exception(f"SytntaxError: {tok_name} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
 
             q = self.top()
+            if self.debug:
+                print('--------------------------------')
         
         print("\nSyntatical analysis completed successfully")
 
 
     def semantics(self, r: int):
-        
-        
         match r:
             case T_rule.PROGRAMA.value:
                 pass
@@ -180,31 +219,51 @@ class SyntaticalAnalyzer:
                 pass
             
             case T_rule.TIPO_INTEGER.value:
-                idu = T_attrib(T_nont.TIPO_, TIPO(type = self.int_))
-                self.push_sem(idu)
+                t = T_attrib(
+                    T_nont.TIPO_,
+                    TIPO(type = self.int_, nSize = 1)
+                )
+                
+                self.push_sem(t)
             
             case T_rule.TIPO_CHAR.value:
-                idu = T_attrib(T_nont.TIPO_, TIPO(type = self.char_))
-                self.push_sem(idu)
+                t = T_attrib(
+                    T_nont.TIPO_,
+                    TIPO(type = self.char_, nSize = 1)
+                )
+                self.push_sem(t)
             
             case T_rule.TIPO_BOOLEAN.value:
-                idu = T_attrib(T_nont.TIPO_, TIPO(type = self.bool_))
-                self.push_sem(idu)
+                t = T_attrib(
+                    T_nont.TIPO_,
+                    TIPO(type = self.bool_, nSize = 1)
+                )
+                self.push_sem(t)
             
             case T_rule.TIPO_STRING.value:
-                idu = T_attrib(T_nont.TIPO_, TIPO(type = self.string_))
-                self.push_sem(idu)
+                t = T_attrib(
+                    T_nont.TIPO_,
+                    TIPO(type = self.string_, nSize = 1)
+                )
+                self.push_sem(t)
             
             case T_rule.TIPO_IDU.value:
-                t: T_attrib = T_attrib(T_nont.TIPO_, TIPO(type = self.universal_))
                 idu: T_attrib = self.top_sem()
                 self.pop_sem()
+                
+                t: T_attrib = T_attrib(
+                    T_nont.TIPO_,
+                    TIPO(type = self.universal_, nSize = 1)
+                )
+                
                 p: Object = idu.attrib.obj
-                p = p.kind_info
-                if self.is_type_kind(p.eKind) or p.eKind == T_kind.UNIVERSAL_:
+                if self.is_type_kind(p) or p.eKind == T_kind.UNIVERSAL_:
                     t.attrib.type = p
+                    t.attrib.nSize = p.kind_info.nSize
                 else:
-                    print(f"SemanticError: Type {p.eKind} is not a valid type in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    t.attrib.type = self.universal_
+                    t.attrib.nSize = 0
+                    self._error(f"SemanticError: Type expected. Got {p.eKind}.")
                 
                 self.push_sem(t)
             
@@ -216,7 +275,11 @@ class SyntaticalAnalyzer:
                 
                 p = idd.attrib.obj
                 p.eKind = T_kind.ARRAY_TYPE_
-                p.kind_info = Array(pElemType = t.attrib.type, nNumElens = num.attrib.val)
+                p.kind_info = Array(
+                    pElemType = t.attrib.type,
+                    nNumElens = num.attrib.val,
+                    nSize = t.attrib.nSize * num.attrib.val
+                )
                 
                 dt: T_attrib = T_attrib(
                     T_nont.DECLARACAO_TIPO_, 
@@ -224,6 +287,7 @@ class SyntaticalAnalyzer:
                         idd.attrib.obj,
                     )
                 )
+                
                 self.push_sem(dt)
             
             case T_rule.DECLARACAO_TIPO_STRUCT.value:
@@ -234,16 +298,20 @@ class SyntaticalAnalyzer:
                 
                 p = idd.attrib.obj
                 p.eKind = T_kind.STRUCT_TYPE_
-                p.kind_info = Struct(pFields = dc.attrib.list)
-                
-                self.scope_manager.end_block()
-                
+                p.kind_info = Struct(
+                    pFields = dc.attrib.list,
+                    nSize = dc.attrib.nSize
+                )
+
                 dt: T_attrib = T_attrib(
                     T_nont.DECLARACAO_TIPO_, 
                     DECLARACAO_TIPO(
                         idd.attrib.obj,
                     )
                 )
+                
+                self.scope_manager.end_block()
+                
                 self.push_sem(dt)
                 
             case T_rule.DECLARACAO_TIPO.value:
@@ -253,14 +321,18 @@ class SyntaticalAnalyzer:
                 
                 p = idd.attrib.obj
                 p.eKind = T_kind.ALIAS_TYPE_
-                p.kind_info = Alias(pBaseType = t.attrib.type)
+                p.kind_info = Alias(
+                    pBaseType = t.attrib.type,
+                    nSize = t.attrib.nSize
+                )
                 
                 dt: T_attrib = T_attrib(
-                    T_nont.DECLARACAO_TIPO_, 
+                    T_nont.DECLARACAO_TIPO_,
                     DECLARACAO_TIPO(
                         idd.attrib.obj,
                     )
                 )
+                
                 self.push_sem(dt)
             
             case T_rule.DECLARACAO_CAMPOS_REC.value:
@@ -268,48 +340,65 @@ class SyntaticalAnalyzer:
                 li = self.top_sem(1)
                 dc1 = self.top_sem(2)
                 self.pop_sem(3)
+                nnn:int = dc1.attrib.nSize
                 
                 p = li.attrib.list
                 while p is not None and p.eKind == T_kind.NO_KIND_DEF_:
                     p.eKind = T_kind.FIELD_
-                    p.kind_info = Field(pType = t.attrib.type)
+                    p.kind_info = Field(
+                        pType = t.attrib.type,
+                        nIndex=nnn,
+                        nSize = t.attrib.nSize
+                    )
+                    nnn += t.attrib.nSize
                     p = p.pNext
                 
                 dc0: T_attrib = T_attrib(
                     T_nont.DECLARACAO_CAMPOS_,
-                    DECLARACAO_CAMPOS(dc1.attrib.list)
+                    DECLARACAO_CAMPOS(
+                        dc1.attrib.list,
+                        nSize = nnn
+                    )
                 )
+                
                 self.push_sem(dc0)
             
             case T_rule.DECLARACAO_CAMPOS.value:
                 t = self.top_sem()
                 li = self.top_sem(1)
                 self.pop_sem(2)
+                nnn: int = 0
 
                 p = li.attrib.list
                 while p is not None and p.eKind == T_kind.NO_KIND_DEF_:
                     p.eKind = T_kind.FIELD_
-                    p.kind_info = Field(pType = t.attrib.type)
+                    p.kind_info = Field(
+                        pType = t.attrib.type,
+                        nSize = t.attrib.nSize,
+                        nIndex = nnn
+                    )
+                    nnn += t.attrib.nSize
                     p = p.pNext
 
                 dc: T_attrib = T_attrib(
                     T_nont.DECLARACAO_CAMPOS_, 
                     DECLARACAO_CAMPOS(
-                        li.attrib.list
+                        li.attrib.list,
+                        nSize = nnn
                     )
                 )
+                
                 self.push_sem(dc)
 
             case T_rule.DECLARACAO_FUNCAO.value:
-                mf = self.top_sem()
-                self.pop_sem()
                 
                 self.scope_manager.end_block()
                 
                 df: T_attrib = T_attrib(
                     T_nont.DECLARACAO_FUNCAO_,
-                    DECLARACAO_FUNCAO(mf.attrib.obj)
+                    None
                 )
+                
                 self.push_sem(df)
             
             case T_rule.NEW_BLOCK.value:
@@ -319,52 +408,86 @@ class SyntaticalAnalyzer:
                     t_nont= T_nont.NEW_BLOCK_,
                     attrib=None
                 )
+                
                 self.push_sem(nb)
+            
+            
+            case T_rule.N_FUNCAO.value:
+                idd = self.top_sem()
+                
+                fun = idd.attrib.obj
+                fun.eKind = T_kind.FUNCTION_
+                fun.kind_info = Function(
+                    nParams = 0,
+                    nVars = 0,
+                    nIndex = self._get_new_n_funcs_index(),
+                )
+                
+                nf: T_attrib = T_attrib(
+                    T_nont.N_FUNCAO_,
+                    None
+                )
+                
+                self.scope_manager.new_block()
+                
+                self.push_sem(nf)
             
             
             case T_rule.MARCADOR_FUNCAO.value:
                 t = self.top_sem()
                 lp = self.top_sem(1)
-                nb = self.top_sem(2)
+                nf = self.top_sem(2)
                 idd = self.top_sem(3)
-                self.pop_sem(4)
                 
-                f = idd.attrib.obj
-                f.eKind = T_kind.FUNCTION_
-                f.kind_info = Function(
+                o = idd.attrib.obj
+                o.kind_info = Function(
                     pRetType = t.attrib.type,
-                    pParams = lp.attrib.list
+                    pParams = lp.attrib.list,
+                    nParams = lp.attrib.nSize,
+                    nVars = lp.attrib.nSize
+                )
+                
+                self.current_function = o
+                
+                self.output_file.write(
+                    f'BEGIN_FUNC {o.kind_info.nIndex}, {o.kind_info.nParams}, {o.kind_info.nVars}\n'
                 )
                 
                 mf: T_attrib = T_attrib(
                     T_nont.MARCADOR_FUNCAO_,
-                    None
+                    MARCADOR_FUNCAO(
+                        offset = self.output_file.tell() - 3
+                    )
                 )
+                
                 self.push_sem(mf)
             
             case T_rule.MARCADOR_C.value:
+                    
                 idu: T_attrib = self.top_sem()
-                self.pop_sem()
+                
                 mc:T_attrib = T_attrib(
-                    t_nont=T_nont.MARCADOR_C,
-                    attrib=None
+                    t_nont=T_nont.MARCADOR_C_,
+                    attrib=MARCADOR_C(
+                        type=None,
+                        param=None,
+                        err=False
+                    )
                 )
                 
                 fun: Object = idu.attrib.obj
                 
                 if fun.eKind != T_kind.FUNCTION_:
-                    print(f"SemanticError: Kind not function in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
-                    mc.attrib = MARCADOR_C(
-                        type=self.universal_,
-                        param=None,
-                        err=True
-                    )
+                    self._error(f"SemanticError: Kind not function")
+                    mc.attrib.type=self.universal_
+                    mc.attrib.param=None
+                    mc.attrib.err=True
+                    
                 else:
-                    mc.attrib = MARCADOR_C(
-                        type=fun.kind_info.pRetType,
-                        param=fun.kind_info.pParams,
-                        err=False
-                    )
+                    mc.attrib.type=fun.kind_info.pRetType
+                    mc.attrib.param=fun.kind_info.pParams
+                    mc.attrib.err=False
+                    
                 
                 self.push_sem(mc)
             
@@ -373,15 +496,23 @@ class SyntaticalAnalyzer:
                 idd = self.top_sem(1)
                 lp1 = self.top_sem(2)
                 self.pop_sem(3)
-                
+                nnn: int = lp1.attrib.nSize
                 p = idd.attrib.obj
                 p.eKind = T_kind.PARAM_
-                p.kind_info = Param(pType = t.attrib.type)
+                p.kind_info = Param(
+                    pType = t.attrib.type,
+                    nIndex = nnn,
+                    nSize = t.attrib.nSize
+                )
                 
                 lp0: T_attrib = T_attrib(
                     T_nont.LISTA_PARAMETROS_,
-                    LISTA_PARAMETROS(lp1.attrib.list)
+                    LISTA_PARAMETROS(
+                        list=lp1.attrib.list,
+                        nSize = t.attrib.nSize + nnn
+                    )
                 )
+                
                 self.push_sem(lp0)
             
             case T_rule.LISTA_PARAMETROS.value:
@@ -391,18 +522,34 @@ class SyntaticalAnalyzer:
                 
                 p = idd.attrib.obj
                 p.eKind = T_kind.PARAM_
-                p.kind_info = Param(pType = t.attrib.type)
+                p.kind_info = Param(
+                    pType = t.attrib.type,
+                    nIndex = 0,
+                    nSize = t.attrib.nSize
+                )
                 
                 lp: T_attrib = T_attrib(
                     T_nont.LISTA_PARAMETROS_,
                     LISTA_PARAMETROS(
-                        idd.attrib.obj
+                        list=p,
+                        nSize = t.attrib.nSize
                     )
                 )
                 self.push_sem(lp)
             
             case T_rule.BLOCO.value:
-                pass
+                mf = self.top_sem()
+                idd = self.top_sem(4)
+                
+                o = idd.attrib.obj
+                offset = mf.attrib.offset
+                self.output_file.write(
+                    f'END_FUNC\n'
+                )
+                current = self.output_file.tell()
+                self.output_file.seek(offset, os.SEEK_SET)
+                self.output_file.write(f'{o.kind_info.nVars}')
+                self.output_file.seek(current, os.SEEK_SET)
             
             case T_rule.LISTA_DECLARACAO_VARIAVEIS_REC.value:
                 pass
@@ -420,12 +567,22 @@ class SyntaticalAnalyzer:
                 t: T_attrib = self.top_sem()
                 li: T_attrib = self.top_sem(1)
                 self.pop_sem(2)
+                self._error(f"Bora tentar pegar o erro aqui:")
+                nnn = self.current_function.kind_info.nVars
+                
                 p: Optional[Object] = li.attrib.list
 
                 while p is not None and p.eKind == T_kind.NO_KIND_DEF_:
                     p.eKind = T_kind.VAR_
-                    p.kind_info = Var(pType = t.attrib.type)
+                    p.kind_info = Var(
+                        pType = t.attrib.type,
+                        nIndex = nnn,
+                        nSize = t.attrib.nSize
+                    )
+                    nnn += t.attrib.nSize
                     p = p.pNext
+                
+                self.current_function.kind_info.nVars = nnn
                 
                 dv: T_attrib = T_attrib(
                     T_nont.DECLARACAO_VARIAVEL_,
@@ -438,54 +595,107 @@ class SyntaticalAnalyzer:
                 li1: T_attrib = self.top_sem(1)
                 self.pop_sem(2)
                 
-                li0: T_attrib = T_attrib(T_nont.LISTA_IDENTIFICADORES_, LISTA_IDENTIFICADORES(li1.attrib.list))
+                li0: T_attrib = T_attrib(
+                    T_nont.LISTA_IDENTIFICADORES_,
+                    LISTA_IDENTIFICADORES(
+                        li1.attrib.list
+                    )
+                )
+
                 self.push_sem(li0)
             
             case T_rule.LISTA_IDENTIFICADORES.value:
                 idd: T_attrib = self.top_sem()
                 self.pop_sem()
-                li: T_attrib = T_attrib(T_nont.LISTA_IDENTIFICADORES_, LISTA_IDENTIFICADORES(idd.attrib.obj))
+                li: T_attrib = T_attrib(
+                    T_nont.LISTA_IDENTIFICADORES_,
+                    LISTA_IDENTIFICADORES(idd.attrib.obj)
+                )
+
                 self.push_sem(li)
+            
+            case T_rule.MT.value:
+                e = self.top_sem()
+                l = self._new_label()
+                
+                if not self.check_types(e.attrib.type, self.bool_):
+                    self._error(f"SemanticError: Type {e.attrib.type.eKind} is not a valid type. Expected type: BOOLEAN")
+                
+                
+                mt: T_attrib = T_attrib(
+                    T_nont.MT_,
+                    MT(label=l)
+                )
+                
+                self.output_file.write(f'\tTJMP_FW L{l}\n')
+                
+                self.push_sem(mt)
+            
+            case T_rule.ME.value:
+                mt = self.top_sem(1)
+                label1 = mt.attrib.label
+                label2 = self._new_label()
+                
+                me: T_attrib = T_attrib(
+                    T_nont.ME_,
+                    ME(label=label2)
+                )
+                
+                self.output_file.write(f'\tJMP_FW L{label2}\nL{label1}:\n')
+                
+                self.push_sem(me)
+            
+            case T_rule.MW.value:
+                label = self._new_label()
+                
+                mw: T_attrib = T_attrib(
+                    T_nont.MW_,
+                    MW(label=label)
+                )
+                
+                self.output_file.write(f'L{label}:\n')
+                
+                self.push_sem(mw)
                 
             case T_rule.COMANDO_IF.value:
-                e = self.top_sem(1)
-                # pop the expression and the command
-                self.pop_sem(2)
+                mt = self.top_sem(1)
+                # pop the expression, MT and S
+                self.pop_sem(3)
+                label = mt.attrib.label
                 
-                t: Object = e.attrib.type
-                
-                if not self.check_types(t, self.bool_):
-                    print(f"SemanticError: Type {t.eKind} is not a valid type. Expected type: BOOLEAN in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                self.output_file.write(f'L{label}:\n')
                 
                 s: T_attrib = T_attrib(
                     T_nont.COMANDO_,
                     None
                 )
+                
                 self.push_sem(s)
             
             case T_rule.COMANDO_IF_ELSE.value:
-                e = self.top_sem(2)
-                # pop the expression and the commands
-                self.pop_sem(3)
-                t: Object = e.attrib.type
+                me = self.top_sem(1)
+                # pop the expression MT and S
+                self.pop_sem(5)
+                label = me.attrib.label
                 
-                if not self.check_types(t, self.bool_):
-                    print(f"SemanticError: Type {t.eKind} is not a valid type. Expected type: BOOLEAN in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                self.output_file.write(f'L{label}:\n')
+                
                 s: T_attrib = T_attrib(
                     T_nont.COMANDO_,
                     None
                 )
+                
                 self.push_sem(s)
             
             case T_rule.COMANDO_WHILE.value:
-                e = self.top_sem(1)
-                # pop the expression and the command
-                self.pop_sem(2)
+                mt = self.top_sem(1)
+                mw = self.top_sem(3)
+                self.pop_sem(4)
                 
-                t: Object = e.attrib.type
+                label1 = mw.attrib.label
+                label2 = mt.attrib.label
                 
-                if not self.check_types(t, self.bool_):
-                    print(f"SemanticError: Type {t.eKind} is not a valid type. Expected type: BOOLEAN in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                self.output_file.write(f'\tJMP_BW L{label1}\nL{label2}:\n')
                 
                 s: T_attrib = T_attrib(
                     T_nont.COMANDO_,
@@ -495,13 +705,16 @@ class SyntaticalAnalyzer:
             
             case T_rule.COMANDO_DO.value:
                 e = self.top_sem()
-                # pop the expression and the command
-                self.pop_sem(2)
+                mw = self.top_sem(2)
+                self.pop_sem(3)
                 
-                t: Object = e.attrib.type
+                label = mw.attrib.label
+                t_: Object = e.attrib.type
                 
-                if not self.check_types(t, self.bool_):
-                    print(f"SemanticError: Type {t.eKind} is not a valid type. Expected type: BOOLEAN in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                if not self.check_types(t_, self.bool_):
+                    self._error(f"SemanticError: Type {t_.eKind} is not a valid type. Expected type: BOOLEAN")
+                
+                self.output_file.write(f'\tNOT\n\tTJMP_BW L{label}\n')
                 
                 s: T_attrib = T_attrib(
                     T_nont.COMANDO_,
@@ -530,15 +743,21 @@ class SyntaticalAnalyzer:
                 t2: Object = e.attrib.type
                 
                 if not self.check_types(t1, t2):
-                    print(f"SemanticError: Type mismatch. Left value type: {t1.eKind}. Expression type: {t2.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    self._error(f"SemanticError: Type mismatch. Left value type: {t1.eKind}. Expression type: {t2.eKind}")
+                
+                self.output_file.write(f'\tSTORE_REF {t1.kind_info.nSize}\n')
                 
                 s: T_attrib = T_attrib(
                     T_nont.COMANDO_,
                     None
                 )
+                
                 self.push_sem(s)
             
             case T_rule.COMANDO_BREAK.value:
+                pass
+            
+            case T_rule.COMANDO_RETURN.value:
                 pass
             
             case T_rule.COMANDO_CONTINUE.value:
@@ -550,10 +769,12 @@ class SyntaticalAnalyzer:
                 self.pop_sem(2)
                 
                 if not self.check_types(e1.attrib.type, self.bool_):
-                    print(f"SemanticError: Type {e1.attrib.type.eKind} is not a valid type. Expected type: BOOLEAN in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                        self._error(f"SemanticError: Type {e1.attrib.type.eKind} is not a valid type. Expected type: BOOLEAN")
                 
                 if not self.check_types(l.attrib.type, self.bool_):
-                    print(f"SemanticError: Type {l.attrib.type.eKind} is not a valid type. Expected type: BOOLEAN in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    self._error(f"SemanticError: Type {l.attrib.type.eKind} is not a valid type. Expected type: BOOLEAN")
+                
+                self.output_file.write(f'\tAND\n')
                 
                 e0: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_,
@@ -578,6 +799,8 @@ class SyntaticalAnalyzer:
                     attrib=EXPRESSAO(e1.attrib.type)
                 )
                 
+                self.output_file.write(f'\tOR\n')
+                
                 self.push_sem(e0)
             
             case T_rule.EXPRESSAO.value:
@@ -597,7 +820,9 @@ class SyntaticalAnalyzer:
                 self.pop_sem(2)
                 
                 if not self.check_types(l1.attrib.type, r.attrib.type):
-                    print(f"SemanticError: Type mismatch. expressao_l type: {l1.attrib.type.eKind}. expressao_r type: {r.attrib.type.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    self._error(f"SemanticError: Type mismatch. expressao_l type: {l1.attrib.type.eKind}. expressao_r type: {r.attrib.type.eKind}")
+                
+                self.output_file.write(f'\tLT\n')
                 
                 l0: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_L_,
@@ -612,7 +837,9 @@ class SyntaticalAnalyzer:
                 self.pop_sem(2)
                 
                 if not self.check_types(l1.attrib.type, r.attrib.type):
-                    print(f"SemanticError: Type mismatch. expressao_l type: {l1.attrib.type.eKind}. expressao_r type: {r.attrib.type.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    self._error(f"SemanticError: Type mismatch. expressao_l type: {l1.attrib.type.eKind}. expressao_r type: {r.attrib.type.eKind}")
+                
+                self.output_file.write(f'\tLE\n')
                 
                 l0: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_L_,
@@ -627,7 +854,9 @@ class SyntaticalAnalyzer:
                 self.pop_sem(2)
                 
                 if not self.check_types(l1.attrib.type, r.attrib.type):
-                    print(f"SemanticError: Type mismatch. expressao_l type: {l1.attrib.type.eKind}. expressao_r type: {r.attrib.type.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    self._error(f"SemanticError: Type mismatch. expressao_l type: {l1.attrib.type.eKind}. expressao_r type: {r.attrib.type.eKind}")
+                
+                self.output_file.write(f'\tGT\n')
                 
                 l0: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_L_,
@@ -642,7 +871,9 @@ class SyntaticalAnalyzer:
                 self.pop_sem(2)
                 
                 if not self.check_types(l1.attrib.type, r.attrib.type):
-                    print(f"SemanticError: Type mismatch. expressao_l type: {l1.attrib.type.eKind}. expressao_r type: {r.attrib.type.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    self._error(f"SemanticError: Type mismatch. expressao_l type: {l1.attrib.type.eKind}. expressao_r type: {r.attrib.type.eKind}")
+                
+                self.output_file.write(f'\tGE\n')
                 
                 l0: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_L_,
@@ -657,7 +888,9 @@ class SyntaticalAnalyzer:
                 self.pop_sem(2)
                 
                 if not self.check_types(l1.attrib.type, r.attrib.type):
-                    print(f"SemanticError: Type mismatch. expressao_l type: {l1.attrib.type.eKind}. expressao_r type: {r.attrib.type.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    self._error(f"SemanticError: Type mismatch. expressao_l type: {l1.attrib.type.eKind}. expressao_r type: {r.attrib.type.eKind}")
+                
+                self.output_file.write(f'\tEQ\n')
                 
                 l0: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_L_,
@@ -672,7 +905,9 @@ class SyntaticalAnalyzer:
                 self.pop_sem(2)
                 
                 if not self.check_types(l1.attrib.type, r.attrib.type):
-                    print(f"SemanticError: Type mismatch. expressao_l type: {l1.attrib.type.eKind}. expressao_r type: {r.attrib.type.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    self._error(f"SemanticError: Type mismatch. expressao_l type: {l1.attrib.type.eKind}. expressao_r type: {r.attrib.type.eKind}")
+                
+                self.output_file.write(f'\tNE\n')
                 
                 l0: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_L_,
@@ -698,15 +933,17 @@ class SyntaticalAnalyzer:
                 self.pop_sem(2)
 
                 if not self.check_types(y.attrib.type, r1.attrib.type):
-                    print(f"SemanticError: Type mismatch. expressao_y type: {y.attrib.type.eKind}. expressao_r type: {r1.attrib.type.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    self._error(f"SemanticError: Type mismatch. expressao_y type: {y.attrib.type.eKind}. expressao_r type: {r1.attrib.type.eKind}")
                 
-                if not self.check_types(r1.attrib.type.eKind, self.int_) and not self.check_types(r1.attrib.type.eKind, self.string_):
-                    print(f"SemanticError: Invalid Type. expressao_r type: {y.attrib.type.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                if not self.check_types(r1.attrib.type, self.int_) and not self.check_types(r1.attrib.type, self.string_):
+                    self._error(f"SemanticError: Invalid Type. expressao_r type: {y.attrib.type.eKind}")
                 
                 r0: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_R_,
                     attrib=EXPRESSAO_R(type=r1.attrib.type)
                 )
+                
+                self.output_file.write(f'\tADD\n')
                 
                 self.push_sem(r0)
             
@@ -715,16 +952,19 @@ class SyntaticalAnalyzer:
                 r1: T_attrib = self.top_sem(1)
                 self.pop_sem(2)
 
-                if not self.check_types(y.attrib.type, r1.attrib.type):
-                    print(f"SemanticError: Type mismatch. expressao_y type: {y.attrib.type.eKind}. expressao_r type: {r1.attrib.type.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                if not self.check_types(r1.attrib.type, self.int_) and not self.check_types(r1.attrib.type, self.string_):
+                    self._error(f"SemanticError: Invalid Type. expressao_r type: {y.attrib.type.eKind}")
                 
-                if not self.check_types(r1.attrib.type.eKind, self.int_) and not self.check_types(r1.attrib.type.eKind, self.string_):
-                    print(f"SemanticError: Invalid Type. expressao_r type: {y.attrib.type.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                if not self.check_types(r1.attrib.type, y.attrib.type):
+                    self._error(f"SemanticError: Type mismatch. expressao_y type: {y.attrib.type.eKind}. expressao_r type: {r1.attrib.type}")
+                
                 
                 r0: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_R_,
                     attrib=EXPRESSAO_R(type=r1.attrib.type)
                 )
+                
+                self.output_file.write(f'\tSUB\n')
                 
                 self.push_sem(r0)
             
@@ -745,15 +985,17 @@ class SyntaticalAnalyzer:
                 self.pop_sem(2)
 
                 if not self.check_types(f.attrib.type, y1.attrib.type):
-                    print(f"SemanticError: Type mismatch. expressao_y type: {f.attrib.type.eKind}. expressao_f type: {y1.attrib.type.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    self._error(f"SemanticError: Type mismatch. expressao_y type: {f.attrib.type.eKind}. expressao_f type: {y1.attrib.type}")
                 
-                if not self.check_types(y1.attrib.type.eKind, self.int_):
-                    print(f"SemanticError: Invalid Type. expressao_y type: {f.attrib.type.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                if not self.check_types(y1.attrib.type, self.int_):
+                    self._error(f"SemanticError: Invalid Type. expressao_y type: {f.attrib.type.eKind}")
                 
                 y0: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_Y_,
                     attrib=EXPRESSAO_Y(type=y1.attrib.type)
                 )
+                
+                self.output_file.write(f'\tMUL\n')
                 
                 self.push_sem(y0)
             
@@ -763,16 +1005,18 @@ class SyntaticalAnalyzer:
                 self.pop_sem(2)
 
                 if not self.check_types(f.attrib.type, y1.attrib.type):
-                    print(f"SemanticError: Type mismatch. expressao_y type: {f.attrib.type.eKind}. expressao_f type: {y1.attrib.type.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    self._error(f"SemanticError: Type mismatch. expressao_y type: {f.attrib.type.eKind}. expressao_f type: {y1.attrib.type.eKind}")
 
-                if not self.check_types(y1.attrib.type.eKind, self.int_):
-                    print(f"SemanticError: Invalid Type. expressao_y type: {f.attrib.type.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                if not self.check_types(y1.attrib.type, self.int_):
+                    self._error(f"SemanticError: Invalid Type. expressao_y type: {f.attrib.type.eKind}")
 
                 y0: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_Y_,
                     attrib=EXPRESSAO_Y(type=y1.attrib.type)
                 )
 
+                self.output_file.write(f'\tDIV\n')
+                
                 self.push_sem(y0)
 
             case T_rule.EXPRESSAO_Y.value:
@@ -795,6 +1039,9 @@ class SyntaticalAnalyzer:
                     attrib=EXPRESSAO_F(type=lv.attrib.type)
                 )
                 
+                nnn = lv.attrib.type.kind_info.nSize
+                self.output_file.write(f'\tDE_REF {nnn}\n')
+                
                 self.push_sem(f)
             
             case T_rule.EXPRESSAO_F_PLUS_PLUS_LEFT_VALUE.value:
@@ -802,12 +1049,15 @@ class SyntaticalAnalyzer:
                 self.pop_sem()
                 
                 if not self.check_types(lv.attrib.type, self.int_):
-                    print(f"SemanticError: Invalid Type. expressao_y type: {lv.attrib.type.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    self._error(f"SemanticError: Invalid Type. expressao_y type: {lv.attrib.type.eKind}")
                 
                 f: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_F_,
                     attrib=EXPRESSAO_F(type=self.int_)
                 )
+                
+                self.output_file.write(f'\tDUP\n\tDUP\tDE_REF 1\n')
+                self.output_file.write(f'\tINC\n\tSTORE_REF 1\tDE_REF 1\n')
                 
                 self.push_sem(f)
             
@@ -816,12 +1066,15 @@ class SyntaticalAnalyzer:
                 self.pop_sem()
                 
                 if not self.check_types(lv.attrib.type, self.int_):
-                    print(f"SemanticError: Invalid Type. expressao_y type: {lv.attrib.type.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    self._error(f"SemanticError: Invalid Type. expressao_y type: {lv.attrib.type.eKind}")
                 
                 f: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_F_,
                     attrib=EXPRESSAO_F(type=self.int_)
                 )
+                
+                self.output_file.write(f'\tDUP\n\tDUP\tDE_REF 1\n')
+                self.output_file.write(f'\tDEC\n\tSTORE_REF 1\tDE_REF 1\n')
                 
                 self.push_sem(f)
             
@@ -830,12 +1083,15 @@ class SyntaticalAnalyzer:
                 self.pop_sem()
                 
                 if not self.check_types(lv.attrib.type, self.int_):
-                    print(f"SemanticError: Invalid Type. expressao_y type: {lv.attrib.type.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    self._error(f"SemanticError: Invalid Type. expressao_y type: {lv.attrib.type.eKind}")
                 
                 f: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_F_,
                     attrib=EXPRESSAO_F(type=self.int_)
                 )
+                
+                self.output_file.write(f'\tDUP\n\tDUP\tDE_REF 1\n\tINC\n')
+                self.output_file.write(f'\tSTORE_REF 1\tDE_REF 1\n\tDEC\n')
                 
                 self.push_sem(f)
             
@@ -844,12 +1100,15 @@ class SyntaticalAnalyzer:
                 self.pop_sem()
                 
                 if not self.check_types(lv.attrib.type, self.int_):
-                    print(f"SemanticError: Invalid Type. expressao_y type: {lv.attrib.type.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    self._error(f"SemanticError: Invalid Type. expressao_y type: {lv.attrib.type.eKind}")
                 
                 f: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_F_,
                     attrib=EXPRESSAO_F(type=self.int_)
                 )
+                
+                self.output_file.write(f'\tDUP\n\tDUP\tDE_REF 1\n\tDEC\n')
+                self.output_file.write(f'\tSTORE_REF 1\tDE_REF 1\n\tINC\n')
 
                 self.push_sem(f)
 
@@ -865,29 +1124,39 @@ class SyntaticalAnalyzer:
                 self.push_sem(f)
 
             case T_rule.EXPRESSAO_F_IDU_LEFT_PARENTHESIS.value:
-                le = self.top_sem()
                 mc = self.top_sem(1)
-                self.pop_sem(2)
+                idu = self.top_sem(2)
+                self.pop_sem(3)
+                
+                fun: Object = idu.attrib.obj
+                
                 f = T_attrib(
                     t_nont=T_nont.EXPRESSAO_F_,
                     attrib=EXPRESSAO_F(type=mc.attrib.type)
                 )
-
+                
                 if not mc.attrib.err:
-                    if le.attrib.param is not None:
-                        print(f"SemanticError: LE with too few args in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    if mc.attrib.param is not None:
+                        self._error(f"SemanticError: LE with too few args")
+                    
+                if not self.error_flag:
+                    self.output_file.write(f'\tCALL {fun.kind_info.nIndex}\n')
+
+                self.push_sem(f)
 
             case T_rule.EXPRESSAO_F_MINUS.value:
                 f1 = self.top_sem()
                 self.pop_sem()
 
                 if not self.check_types(f1.attrib.type, self.int_):
-                    print(f"SemanticError: Invalid Type. expressao_f type: {f1.attrib.type.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    self._error(f"SemanticError: Invalid Type. expressao_f type: {f1.attrib.type.eKind}")
 
                 f0: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_F_,
                     attrib=EXPRESSAO_F(type=self.int_)
                 )
+                
+                self.output_file.write(f'\tNEG\n')
 
                 self.push_sem(f0)
             
@@ -896,12 +1165,14 @@ class SyntaticalAnalyzer:
                 self.pop_sem()
 
                 if not self.check_types(f1.attrib.type, self.bool_):
-                    print(f"SemanticError: Invalid Type. expressao_f type: {f1.attrib.type.eKind} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    self._error(f"SemanticError: Invalid Type. expressao_f type: {f1.attrib.type.eKind}")
 
                 f0: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_F_,
                     attrib=EXPRESSAO_F(type=self.bool_)
                 )
+                
+                self.output_file.write(f'\tNOT\n')
 
                 self.push_sem(f0)
             
@@ -910,6 +1181,9 @@ class SyntaticalAnalyzer:
                     t_nont=T_nont.EXPRESSAO_F_,
                     attrib=EXPRESSAO_F(type=self.bool_)
                 )
+                
+                nnn = self.current_id_token.secondary_token
+                self.output_file.write(f'\tLOAD_CONST {nnn}\n')
 
                 self.push_sem(f0)
             
@@ -919,6 +1193,9 @@ class SyntaticalAnalyzer:
                     attrib=EXPRESSAO_F(type=self.bool_)
                 )
 
+                nnn = self.current_id_token.secondary_token
+                self.output_file.write(f'\tLOAD_CONST {nnn}\n')
+
                 self.push_sem(f0)
             
             case T_rule.EXPRESSAO_F_CHARACTER.value:
@@ -926,6 +1203,9 @@ class SyntaticalAnalyzer:
                     t_nont=T_nont.EXPRESSAO_F_,
                     attrib=EXPRESSAO_F(type=self.char_)
                 )
+
+                nnn = self.current_id_token.secondary_token
+                self.output_file.write(f'\tLOAD_CONST {nnn}\n')
 
                 self.push_sem(f0)
             
@@ -935,6 +1215,9 @@ class SyntaticalAnalyzer:
                     attrib=EXPRESSAO_F(type=self.string_)
                 )
 
+                nnn = self.current_id_token.secondary_token
+                self.output_file.write(f'\tLOAD_CONST {nnn}\n')
+
                 self.push_sem(f0)
             
             case T_rule.EXPRESSAO_F_NUMERAL.value:
@@ -943,12 +1226,15 @@ class SyntaticalAnalyzer:
                     attrib=EXPRESSAO_F(type=self.int_)
                 )
 
+                nnn = self.current_id_token.secondary_token
+                self.output_file.write(f'\tLOAD_CONST {nnn}\n')
+
                 self.push_sem(f0)
             
             case T_rule.LISTA_EXPRESSOES_REC.value:
                 e = self.top_sem()
                 le1 = self.top_sem(1)
-                self.pop_sem(2)
+                
                 le0 = T_attrib(
                     t_nont=T_nont.LISTA_EXPRESSOES_,
                     attrib=LISTA_EXPRESSOES(
@@ -962,19 +1248,21 @@ class SyntaticalAnalyzer:
                 if not le1.attrib.err:
                     p = le1.attrib.param
                     if p is None:
-                        print(f"SemanticError: LE with too many args in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                        self._error(f"SemanticError: LE with too many args")
                         le0.attrib.err = True
                     else:
                         if not self.check_types(p.kind_info.pType, e.attrib.type):
-                            print(f"SemanticError: Error param type {n} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                            self._error(f"SemanticError: Error param type {n}")
                         le0.attrib.param = p.pNext
                         le0.attrib.n = n + 1
+                    
+                    
+                self.push_sem(le0)
                         
             
             case T_rule.LISTA_EXPRESSOES.value:
                 e: T_attrib = self.top_sem()
                 mc: T_attrib = self.top_sem(1)
-                self.pop_sem(2)
                 
                 le: T_attrib = T_attrib(
                     t_nont=T_nont.LISTA_EXPRESSOES_,
@@ -989,11 +1277,11 @@ class SyntaticalAnalyzer:
                 if not mc.attrib.err:
                     p = mc.attrib.param
                     if p is None:
-                        print(f"SemanticError: LE with too many args in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                        self._error(f"SemanticError: LE with too many args")
                         le.attrib.err = True
                     else:
                         if not self.check_types(p.kind_info.pType, e.attrib.type):
-                            print(f"SemanticError: Error param type {n} in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                            self._error(f"SemanticError: Error param type {n}")
                         le.attrib.param = p.pNext
                         le.attrib.n = n + 1
                 
@@ -1006,25 +1294,29 @@ class SyntaticalAnalyzer:
                 
                 lv0: T_attrib = T_attrib(
                     t_nont=T_nont.VALOR_ESQUERDO_,
-                    attrib=None
+                    attrib=VALOR_ESQUERDO(type=None)
                 )
-                t = lv1.attrib.type
+                t_ = lv1.attrib.type
                 
-                if t.eKind != T_kind.STRUCT_TYPE_:
-                    if t.eKind != T_kind.UNIVERSAL_:
-                        print(f"SemanticError: Kind not struct in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                if t_.eKind != T_kind.STRUCT_TYPE_:
+                    if t_.eKind != T_kind.UNIVERSAL_:
+                        self._error(f"SemanticError: Kind not struct")
                     lv0.attrib = VALOR_ESQUERDO(type=self.universal_)
                 else:
-                    p = t.kind_info.pFields
+                    p = t_.kind_info.pFields
                     while p is not None:
                         if p.nName == id.attrib.name:
                             break
                         p = p.pNext
                     if p is None:
-                        print(f"SemanticError: Field not declared in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                        self._error(f"SemanticError: Field not declared")
                         lv0.attrib.type = self.universal_
                     else:
                         lv0.attrib.type = p.kind_info.pType
+                        
+                        self.output_file.write(f'\tADD {p.kind_info.nIndex}\n')
+
+                self.push_sem(lv0)
                         
             
             case T_rule.VALOR_ESQUERDO_LEFT_SQUARE.value:
@@ -1034,22 +1326,24 @@ class SyntaticalAnalyzer:
 
                 lv0 = T_attrib(
                     t_nont=T_nont.VALOR_ESQUERDO_,
-                    attrib=None
+                    attrib=VALOR_ESQUERDO(type=None)
                 )
                 
-                t = lv1.attrib.type
+                t_ = lv1.attrib.type
                 
-                if t == self.string_:
+                if t_ == self.string_:
                     lv0.attrib = VALOR_ESQUERDO(type=self.char_)
-                elif t.eKind != T_kind.ARRAY_TYPE_:
-                    if t.eKind != T_kind.UNIVERSAL_:
-                        print(f"SemanticError: Kind not array in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                elif t_.eKind != T_kind.ARRAY_TYPE_:
+                    if t_.eKind != T_kind.UNIVERSAL_:
+                        self._error(f"SemanticError: Kind not array")
+                        lv0.attrib = VALOR_ESQUERDO(type=self.universal_)
                     lv0.attrib = VALOR_ESQUERDO(type=self.universal_)
                 else:
-                    lv0.attrib = VALOR_ESQUERDO(type=t.kind_info.pElemType)
+                    lv0.attrib = VALOR_ESQUERDO(type=t_.kind_info.pElemType)
+                    self.output_file.write(f'\tMUL {t_.kind_info.pElemType.kind_info.nSize}\n\tADD\n')
                 
                 if not self.check_types(e.attrib.type, self.int_):
-                    print(f"SemanticError: Invalid index type in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    self._error(f"SemanticError: Invalid index type")
                 
                 self.push_sem(lv0)
 
@@ -1060,24 +1354,24 @@ class SyntaticalAnalyzer:
                 
                 lv: T_attrib = T_attrib(
                     t_nont=T_nont.VALOR_ESQUERDO_,
-                    attrib=None
+                    attrib=VALOR_ESQUERDO(type=None)
                 )
                 
                 if p.eKind != T_kind.VAR_ and p.eKind != T_kind.PARAM_:
                     if p.eKind != T_kind.UNIVERSAL_:
-                        print(f"SemanticError: Kind not VAR in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                        self._error(f"SemanticError: Kind not VAR")
                     lv.attrib = VALOR_ESQUERDO(type=self.universal_)
                 else:
                     lv.attrib = VALOR_ESQUERDO(type=p.kind_info.pType)
+                    self.output_file.write(f'\tLOAD_REF {p.kind_info.pType.kind_info.nIndex}\n')
                 
                 self.push_sem(lv)
             
             case T_rule.IDD.value:
-                name = self.current_token.secondary_token
-                
+                name = self.current_id_token.secondary_token
                 p = self.scope_manager.search(name)
                 if p is not None:
-                    print(f"SemanticError: Variable {name} already defined in line {self.current_token.line}. Lexeme: \'{self.current_token.lexeme}\'. column: {self.current_token.col}")
+                    print(f"SemanticError: Variable {name} already defined in line {self.current_id_token.line}. Lexeme: \'{self.current_id_token.lexeme}\'. column: {self.current_id_token.col}")
                 else:
                     p = self.scope_manager.define(name)
                 
@@ -1087,7 +1381,7 @@ class SyntaticalAnalyzer:
                 self.push_sem(idd)
                 
             case T_rule.IDU.value:
-                name = self.current_token.secondary_token
+                name = self.current_id_token.secondary_token
                 idu: T_attrib = T_attrib(T_nont.IDU_, IDU(name, None))
                 
                 p = self.scope_manager.find(name)
@@ -1100,7 +1394,7 @@ class SyntaticalAnalyzer:
                 self.push_sem(idu)
             
             case T_rule.ID.value:
-                name = self.current_token.secondary_token
+                name = self.current_id_token.secondary_token
                 id: T_attrib = T_attrib(T_nont.ID_, ID(name, None))
                 
                 self.push_sem(id)
@@ -1130,8 +1424,8 @@ class SyntaticalAnalyzer:
                     T_nont.CHR_, 
                     CHR(
                         type = self.char_,
-                        pos = self.current_token.secondary_token,
-                        val = self.lexer.symbol_table.get_constant(self.current_token.secondary_token)
+                        pos = self.current_const_token.secondary_token,
+                        val = self.lexer.symbol_table.get_constant(self.current_const_token.secondary_token)
                     )
                 )
                 self.push_sem(chr)
@@ -1141,8 +1435,8 @@ class SyntaticalAnalyzer:
                     T_nont.STR_, 
                     STR(
                         type = self.string_,
-                        pos = self.current_token.secondary_token,
-                        val = self.lexer.symbol_table.get_constant(self.current_token.secondary_token)
+                        pos = self.current_const_token.secondary_token,
+                        val = self.lexer.symbol_table.get_constant(self.current_const_token.secondary_token)
                     )
                 )
                 self.push_sem(str)
@@ -1152,8 +1446,8 @@ class SyntaticalAnalyzer:
                     T_nont.NUM_, 
                     NUM(
                         type = self.int_,
-                        pos = self.current_token.secondary_token,
-                        val = int(self.lexer.symbol_table.get_constant(self.current_token.secondary_token))
+                        pos = self.current_const_token.secondary_token,
+                        val = int(self.lexer.symbol_table.get_constant(self.current_const_token.secondary_token))
                     )
                 )
                 self.push_sem(num)
@@ -1192,3 +1486,17 @@ class SyntaticalAnalyzer:
                     return self.check_types(t1.kind_info.pBaseType, t2.kind_info.pBaseType)
         
         return False
+    
+    
+    def print_stack_sem(self):
+        print("++++++++++++++++++++++++++++++++")
+        for item in self.stack_sem:
+            print(f'item: {item.t_nont}')
+        print("--------------------------------")
+        
+        
+    def _error(self, message: str):
+        print(message)
+        print(f"current token: {self.current_token}")
+        print(f"current id token: {self.current_id_token}")
+        print(f"current const token: {self.current_const_token}")

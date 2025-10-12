@@ -4,15 +4,15 @@ from object import Object
 
 class ScopeManager:
     def __init__(self):
-        self.symbol_table: list[Optional[Object]] = []
-        self.symbol_table_last: list[Optional[Object]] = []
-        self.current_level: int = -1
+        self.symbol_table: list[Optional[Object]] = [None]
+        self.symbol_table_last: list[Optional[Object]] = [None]
+        self.current_level: int = 0
 
 
     def new_block(self):
         self.current_level += 1
-        self.symbol_table[self.current_level] = None
-        self.symbol_table_last[self.current_level] = None
+        self.symbol_table.append(None)
+        self.symbol_table_last.append(None)
         return self.current_level
     
     

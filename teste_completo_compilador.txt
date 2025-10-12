@@ -1,0 +1,85 @@
+type inteiro = integer
+type nome = string
+type VetorInt = array [5] of integer
+type MatrizInt = array[3] of VetorInt
+type Ponto = struct {
+    x, y : integer; tag : string; flag : boolean; ch : char
+}
+
+var g, i, j : inteiro;
+var b : boolean;
+var texto : nome;
+var c : char;
+var v : VetorInt;
+var m : MatrizInt;
+var p : Ponto;
+
+function soma(a : integer, b : integer) : integer {
+    var res : integer;
+    res = a + b;
+    if (a < b) res = b;
+    else res = a;
+    return res;
+}
+
+function fatorial(n : integer) : integer {
+    var result : integer;
+    result = 1;
+    if (n == 0) {
+        var base : integer;
+        base = 1;
+        g = base;
+    } else {
+        var tmp : integer;
+        tmp = n - 1;
+        g = result * n;
+        g = result + fatorial(tmp);
+    }
+    return result;
+}
+
+function loop_demo(limit : integer) : integer {
+    var count : integer;
+    var acc : integer;
+    count = 0;
+    acc = 0;
+
+    while (count < limit) {
+        var t : integer;
+        i = ++count;
+        j = count++;
+        i = --count;
+        j = count--;
+        acc = acc + count;
+        if ((count == 2) || (true && !false)) continue;
+        if ((count != 3) && (count <= 4) || (count >= 10)) break;
+    }
+
+    do {
+        var x : integer;
+        x = 1;
+        acc = acc + x;
+        count = count - 1;
+    } while (count > 0);
+
+    v[0] = 10;
+    v[1] = v[0] + 3;
+    m[1][2] = v[1] * 2;
+    acc = m[1][2] / 2;
+    i = -i;
+    v[2] = -1;
+    p.x = m[1][2];
+    p.y = v[0];
+    p.tag = "ponto";
+    p.flag = true;
+    p.ch = 'Z';
+
+    texto = "hello";
+    c = 'A';
+    b = (p.flag && (i < j)) || (!false);
+
+    g = soma(acc, count);
+    return acc;
+}
+
+

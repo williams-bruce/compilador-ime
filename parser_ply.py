@@ -1,5 +1,4 @@
 import sys
-from types import SimpleNamespace
 from ply import yacc
 from ply.lex import LexToken
 
@@ -15,7 +14,7 @@ from lexical import Lexer
 tokens = (
     'ARRAY', 'BOOLEAN', 'BREAK', 'CHAR', 'CONTINUE', 'DO', 'ELSE', 'FALSE',
     'FUNCTION', 'IF', 'INTEGER', 'OF', 'STRING', 'STRUCT', 'TRUE', 'TYPE',
-    'VAR', 'WHILE',
+    'VAR', 'WHILE', 'RETURN',
     'COLON', 'PLUS', 'MINUS', 'SEMI_COLON', 'COMMA',
     'LEFT_SQUARE', 'RIGHT_SQUARE', 'LEFT_BRACES', 'RIGHT_BRACES',
     'LEFT_PARENTHESIS', 'RIGHT_PARENTHESIS',
@@ -120,7 +119,7 @@ def p_declaracao_campos(p):
 
 
 def p_declaracao_funcao(p):
-    """declaracao_funcao : FUNCTION idd new_block LEFT_PARENTHESIS lista_parametros RIGHT_PARENTHESIS COLON tipo marcador_funcao bloco"""
+    """declaracao_funcao : FUNCTION idd n_funcao LEFT_PARENTHESIS lista_parametros RIGHT_PARENTHESIS COLON tipo marcador_funcao bloco"""
     p[0] = ('funcao',) + tuple(p[1:])
 
 
@@ -132,6 +131,11 @@ def p_new_block(p):
 def p_marcador_funcao(p):
     """marcador_funcao : """
     p[0] = ('marcador_funcao',)
+
+
+def p_n_funcao(p):
+    """n_funcao : """
+    p[0] = ('n_funcao',)
 
 
 def p_marcador_c(p):
@@ -189,15 +193,31 @@ def p_lista_identificadores(p):
         p[0] = p[1]
 
 
+def p_mt(p):
+    """mt : """
+    p[0] = ('mt',)
+
+
+def p_me(p):
+    """me : """
+    p[0] = ('me',)
+    
+
+def p_mw(p):
+    """mw : """
+    p[0] = ('mw',)
+
+
 def p_comando(p):
-    """comando : IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando %prec LOWER_THAN_ELSE
-                | IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando ELSE comando
-                | WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
-                | DO comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
+    """comando : IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando %prec LOWER_THAN_ELSE
+                | IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando ELSE me comando
+                | WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+                | DO mw comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
                 | new_block bloco
                 | valor_esquerdo EQUALS expressao SEMI_COLON
                 | BREAK SEMI_COLON
-                | CONTINUE SEMI_COLON"""
+                | CONTINUE SEMI_COLON
+                | RETURN expressao SEMI_COLON"""
     p[0] = ('cmd',) + tuple(p[1:])
 
 
