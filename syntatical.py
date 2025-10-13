@@ -630,29 +630,44 @@ class SyntaticalAnalyzer:
                 li: T_attrib = self.top_sem(1)
                 self.pop_sem(2)
                 
-                # Only increment nVars for variables in the function's main block
-                # (not in nested blocks like while/if)
-                is_function_block = (self.scope_manager.current_level == self.current_function_level)
-                
-                # Variable indices start after parameters
-                nnn = self.current_function.kind_info.nParams + self.current_function.kind_info.nVars
-                count = 0
-                p: Optional[Object] = li.attrib.list
+                # Check if we're inside a function or at global scope
+                if self.current_function is None:
+                    # Global variables - just mark them as VAR with index 0
+                    # (global variables are not used in the bytecode generation)
+                    p: Optional[Object] = li.attrib.list
+                    while p is not None and p.eKind == T_kind.NO_KIND_DEF_:
+                        p.eKind = T_kind.VAR_
+                        p.kind_info = Var(
+                            pType = t.attrib.type,
+                            nIndex = 0,  # Global variables don't need indices
+                            nSize = t.attrib.nSize
+                        )
+                        p = p.pNext
+                else:
+                    # Local variables inside a function
+                    # Only increment nVars for variables in the function's main block
+                    # (not in nested blocks like while/if)
+                    is_function_block = (self.scope_manager.current_level == self.current_function_level)
+                    
+                    # Variable indices start after parameters
+                    nnn = self.current_function.kind_info.nParams + self.current_function.kind_info.nVars
+                    count = 0
+                    p: Optional[Object] = li.attrib.list
 
-                while p is not None and p.eKind == T_kind.NO_KIND_DEF_:
-                    p.eKind = T_kind.VAR_
-                    p.kind_info = Var(
-                        pType = t.attrib.type,
-                        nIndex = nnn,
-                        nSize = t.attrib.nSize
-                    )
-                    nnn += t.attrib.nSize
-                    count += t.attrib.nSize
-                    p = p.pNext
-                
-                # Only update nVars if this is the function's main block
-                if is_function_block:
-                    self.current_function.kind_info.nVars += count
+                    while p is not None and p.eKind == T_kind.NO_KIND_DEF_:
+                        p.eKind = T_kind.VAR_
+                        p.kind_info = Var(
+                            pType = t.attrib.type,
+                            nIndex = nnn,
+                            nSize = t.attrib.nSize
+                        )
+                        nnn += t.attrib.nSize
+                        count += t.attrib.nSize
+                        p = p.pNext
+                    
+                    # Only update nVars if this is the function's main block
+                    if is_function_block:
+                        self.current_function.kind_info.nVars += count
                 
                 dv: T_attrib = T_attrib(
                     T_nont.DECLARACAO_VARIAVEL_,
@@ -1685,7 +1700,17 @@ class SyntaticalAnalyzer:
         return p.eKind in [T_kind.SCALAR_TYPE_, T_kind.ARRAY_TYPE_, T_kind.STRUCT_TYPE_, T_kind.ALIAS_TYPE_]
     
     
+    def resolve_alias(self, t: Object) -> Object:
+        """Resolve type aliases recursively to get the base type."""
+        if t.eKind == T_kind.ALIAS_TYPE_:
+            return self.resolve_alias(t.kind_info.pBaseType)
+        return t
+    
     def check_types(self, t1: Object, t2: Object) -> bool:
+        # Resolve aliases first
+        t1 = self.resolve_alias(t1)
+        t2 = self.resolve_alias(t2)
+        
         if t1 == t2:
             return True
         elif t1 == self.universal_ or t2 == self.universal_:
@@ -1709,9 +1734,6 @@ class SyntaticalAnalyzer:
                         f2 = f2.pNext
                     
                     return f1 is None and f2 is None
-                
-                case T_kind.ALIAS_TYPE_:
-                    return self.check_types(t1.kind_info.pBaseType, t2.kind_info.pBaseType)
         
         return False
     
