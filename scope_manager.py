@@ -17,6 +17,11 @@ class ScopeManager:
     
     
     def end_block(self):
+        # Remove symbols from the current level
+        if self.current_level < len(self.symbol_table):
+            self.symbol_table[self.current_level] = None
+            self.symbol_table_last[self.current_level] = None
+        
         self.current_level -= 1
         return self.current_level
 

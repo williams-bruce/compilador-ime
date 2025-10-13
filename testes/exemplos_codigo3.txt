@@ -1,70 +1,116 @@
 Exemplo de código:
 
 
-function strinv( s:string ) : string
+type intArray = array [30] of integer;
+function bSort(a:intArray, n:integer):
+intArray
 {
-    var i, l :integer;
-    var c: char;
+    var i, j, v:integer;
     i = 0;
-    l = 0;
 
-    while(s[l] != '\0' )
+    while( i < n )
     {
-        l = l+1;
+        j = i+1;
+        while( j < n )
+        {
+            if( a[i] > a[j] )
+            {
+                v = a[i];
+                a[i++] = a[j];
+                a[j++] = v;
+            }
+        }
     }
 
-    while( i < l )
-    {
-        c = s[i];
-        s[i++] = s[l];
-        s[l++] = c;
-    }
-
-    return s;
+    return a;
 }
 
 bytecode gerado a partir do código acima:
 
 BEGIN_FUNC 0 2 1
+    LOAD_REF 2
     LOAD_CONST 0
-    STORE_VAR 1
-    LOAD_CONST 1
-    STORE_VAR 2
+    STORE_REF 1
 L0:
-    LOAD_VAR 2
-    CHAR_AT 0
-    LOAD_CONST 1
-    NEQ
-    TJMP_FW L1
-    LOAD_VAR 2
-    LOAD_CONST 2
-    ADD
-    STORE_VAR 2
-    JMP_BW L0
-L1:
-L2:
+    LOAD_REF 1
+    DE_REF 1
     LOAD_VAR 1
-    LOAD_VAR 2
+    DE_REF 1
+    LT
+    TJMP_FW L1
+    LOAD_REF 3
+    LOAD_REF 2
+    DE_REF 1
+    LOAD_CONST 1
+    ADD
+    STORE_REF 1
+L2:
+    LOAD_REF 3
+    DE_REF 1
+    LOAD_REF 1
+    DE_REF 1
     LT
     TJMP_FW L3
-    LOAD_VAR 1
-    CHAR_AT 0
-    STORE_VAR 3
-    LOAD_VAR 1
+    LOAD_REF 0
+    LOAD_REF 2
+    DE_REF 1
+    MUL 1
+    ADD
+    DE_REF 1
+    LOAD_REF 0
+    LOAD_REF 3
+    DE_REF 1
+    MUL 1
+    ADD
+    DE_REF 1
+    GT
+    TJMP_FW L4
+    LOAD_REF 1
+    LOAD_REF 0
+    LOAD_REF 2
+    DE_REF 1
+    MUL 1
+    ADD
+    DE_REF 1
+    STORE_REF 1
+    LOAD_REF 0
+    LOAD_REF 2
     DUP
-    INC
-    STORE_VAR 1
-    LOAD_VAR 2
-    CHAR_AT 0
-    SET_CHAR 0
-    LOAD_VAR 2
     DUP
+    DE_REF 1
     INC
-    STORE_VAR 2
-    LOAD_VAR 3
-    SET_CHAR 0
+    STORE_REF 1
+    DE_REF 1
+    DEC
+    MUL 1
+    ADD
+    LOAD_REF 0
+    LOAD_REF 3
+    DE_REF 1
+    MUL 1
+    ADD
+    DE_REF 1
+    STORE_REF 1
+    LOAD_REF 0
+    LOAD_REF 3
+    DUP
+    DUP
+    DE_REF 1
+    INC
+    STORE_REF 1
+    DE_REF 1
+    DEC
+    MUL 1
+    ADD
+    LOAD_REF 1
+    DE_REF 1
+    STORE_REF 1
+L4:
     JMP_BW L2
 L3:
-    LOAD_VAR 0
+    JMP_BW L0
+L1:
+    LOAD_REF 0
+    DE_REF 30
     RET
 END_FUNC

@@ -152,6 +152,7 @@ class LISTA_EXPRESSOES:
 @dataclass
 class VALOR_ESQUERDO:
     type: Object
+    obj: Object = None
 
 
 @dataclass

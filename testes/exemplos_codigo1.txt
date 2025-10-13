@@ -22,7 +22,7 @@ function somaFat(n : integer) : integer
 
     while( ++i <= n )
     {
-        s = s + fat(i);
+        s = s + fatorial(i);
     }
 
     return s;
@@ -69,7 +69,7 @@ L2:
     TJMP_FW L3
     LOAD_VAR 2
     LOAD_VAR 1
-    CALL
+    CALL 0
     ADD
     STORE_VAR 2
     JMP_BW L2

@@ -40,6 +40,7 @@ class SyntaticalAnalyzer:
         self.n_funcs_index: int = 0
         self._num_labels: int = 0
         self.current_function: Object = None
+        self.current_function_level: int = -1  # Track the function's main block level
         self.error_flag: bool = False
         
         self.debug: bool = False
@@ -452,11 +453,13 @@ class SyntaticalAnalyzer:
                     pRetType = t.attrib.type,
                     pParams = lp.attrib.list,
                     nParams = lp.attrib.nSize,
-                    nVars = lp.attrib.nSize,
+                    nVars = 0,  # nVars counts only local variables (not parameters)
                     nIndex = saved_nIndex  # Preserve the index from N_FUNCAO
                 )
                 
                 self.current_function = o
+                # Save the current scope level (this is the function's block level)
+                self.current_function_level = self.scope_manager.current_level
                 
                 self.output_file.write(
                     f'BEGIN_FUNC {o.kind_info.nIndex} {o.kind_info.nParams} {o.kind_info.nVars}\n'
@@ -573,6 +576,9 @@ class SyntaticalAnalyzer:
                     self.output_file.seek(offset, os.SEEK_SET)
                     self.output_file.write(f'{o.kind_info.nVars}')
                     self.output_file.seek(current, os.SEEK_SET)
+                    
+                    # Reset function level when exiting function's main block
+                    self.current_function_level = -1
                 
                 # Push BLOCO to maintain stack consistency for COMANDO_BLOCO
                 bloco_attrib = T_attrib(T_nont.BLOCO_, None)
@@ -607,8 +613,14 @@ class SyntaticalAnalyzer:
                 t: T_attrib = self.top_sem()
                 li: T_attrib = self.top_sem(1)
                 self.pop_sem(2)
-                nnn = self.current_function.kind_info.nVars
                 
+                # Only increment nVars for variables in the function's main block
+                # (not in nested blocks like while/if)
+                is_function_block = (self.scope_manager.current_level == self.current_function_level)
+                
+                # Variable indices start after parameters
+                nnn = self.current_function.kind_info.nParams + self.current_function.kind_info.nVars
+                count = 0
                 p: Optional[Object] = li.attrib.list
 
                 while p is not None and p.eKind == T_kind.NO_KIND_DEF_:
@@ -619,9 +631,12 @@ class SyntaticalAnalyzer:
                         nSize = t.attrib.nSize
                     )
                     nnn += t.attrib.nSize
+                    count += t.attrib.nSize
                     p = p.pNext
                 
-                self.current_function.kind_info.nVars = nnn
+                # Only update nVars if this is the function's main block
+                if is_function_block:
+                    self.current_function.kind_info.nVars += count
                 
                 dv: T_attrib = T_attrib(
                     T_nont.DECLARACAO_VARIAVEL_,
@@ -829,9 +844,13 @@ class SyntaticalAnalyzer:
                 if not self.check_types(t1, t2):
                     self._error(f"SemanticError: Type mismatch. Left value type: {t1.eKind}. Expression type: {t2.eKind}")
                 
-                nSize = self.get_type_size(t1)
-                
-                self.output_file.write(f'\tSTORE_REF {nSize}\n')
+                # For simple variables (VAR, PARAM), use STORE_VAR
+                # For complex types (arrays, structs), use STORE_REF
+                if lv.attrib.obj and (lv.attrib.obj.eKind == T_kind.VAR_ or lv.attrib.obj.eKind == T_kind.PARAM_):
+                    self.output_file.write(f'\tSTORE_VAR {lv.attrib.obj.kind_info.nIndex}\n')
+                else:
+                    nSize = self.get_type_size(t1)
+                    self.output_file.write(f'\tSTORE_REF {nSize}\n')
                 
                 s: T_attrib = T_attrib(
                     T_nont.COMANDO_,
@@ -1142,9 +1161,13 @@ class SyntaticalAnalyzer:
                     attrib=EXPRESSAO_F(type=lv.attrib.type)
                 )
                 
-                nnn = self.get_type_size(lv.attrib.type)
-                    
-                self.output_file.write(f'\tDE_REF {nnn}\n')
+                # For simple variables (VAR, PARAM), use LOAD_VAR
+                # For complex types (arrays, structs), use DE_REF
+                if lv.attrib.obj and (lv.attrib.obj.eKind == T_kind.VAR_ or lv.attrib.obj.eKind == T_kind.PARAM_):
+                    self.output_file.write(f'\tLOAD_VAR {lv.attrib.obj.kind_info.nIndex}\n')
+                else:
+                    nnn = self.get_type_size(lv.attrib.type)
+                    self.output_file.write(f'\tDE_REF {nnn}\n')
                 
                 self.push_sem(f)
             
@@ -1160,8 +1183,14 @@ class SyntaticalAnalyzer:
                     attrib=EXPRESSAO_F(type=self.int_)
                 )
                 
-                self.output_file.write(f'\tDUP\n\tDUP\n\tDE_REF 1\n')
-                self.output_file.write(f'\tINC\n\tSTORE_REF 1\n\tDE_REF 1\n')
+                # ++LV: Load, increment, duplicate, store (value on stack is NEW value)
+                # Pattern: LOAD_VAR n, INC, DUP, STORE_VAR n
+                if lv.attrib.obj and (lv.attrib.obj.eKind == T_kind.VAR_ or lv.attrib.obj.eKind == T_kind.PARAM_):
+                    idx = lv.attrib.obj.kind_info.nIndex
+                    self.output_file.write(f'\tLOAD_VAR {idx}\n\tINC\n\tDUP\n\tSTORE_VAR {idx}\n')
+                else:
+                    self.output_file.write(f'\tDUP\n\tDUP\n\tDE_REF 1\n')
+                    self.output_file.write(f'\tINC\n\tSTORE_REF 1\n\tDE_REF 1\n')
                 
                 self.push_sem(f)
             
@@ -1177,8 +1206,14 @@ class SyntaticalAnalyzer:
                     attrib=EXPRESSAO_F(type=self.int_)
                 )
                 
-                self.output_file.write(f'\tDUP\n\tDUP\n\tDE_REF 1\n')
-                self.output_file.write(f'\tDEC\n\tSTORE_REF 1\n\tDE_REF 1\n')
+                # --LV: Load, decrement, duplicate, store (value on stack is NEW value)
+                # Pattern: LOAD_VAR n, DEC, DUP, STORE_VAR n
+                if lv.attrib.obj and (lv.attrib.obj.eKind == T_kind.VAR_ or lv.attrib.obj.eKind == T_kind.PARAM_):
+                    idx = lv.attrib.obj.kind_info.nIndex
+                    self.output_file.write(f'\tLOAD_VAR {idx}\n\tDEC\n\tDUP\n\tSTORE_VAR {idx}\n')
+                else:
+                    self.output_file.write(f'\tDUP\n\tDUP\n\tDE_REF 1\n')
+                    self.output_file.write(f'\tDEC\n\tSTORE_REF 1\n\tDE_REF 1\n')
                 
                 self.push_sem(f)
             
@@ -1194,8 +1229,14 @@ class SyntaticalAnalyzer:
                     attrib=EXPRESSAO_F(type=self.int_)
                 )
                 
-                self.output_file.write(f'\tDUP\n\tDUP\n\tDE_REF 1\n\tINC\n')
-                self.output_file.write(f'\tSTORE_REF 1\n\tDE_REF 1\n\tDEC\n')
+                # LV++: Load, duplicate, increment, store (value on stack is OLD value)
+                # Pattern: LOAD_VAR n, DUP, INC, STORE_VAR n
+                if lv.attrib.obj and (lv.attrib.obj.eKind == T_kind.VAR_ or lv.attrib.obj.eKind == T_kind.PARAM_):
+                    idx = lv.attrib.obj.kind_info.nIndex
+                    self.output_file.write(f'\tLOAD_VAR {idx}\n\tDUP\n\tINC\n\tSTORE_VAR {idx}\n')
+                else:
+                    self.output_file.write(f'\tDUP\n\tDUP\n\tDE_REF 1\n\tINC\n')
+                    self.output_file.write(f'\tSTORE_REF 1\n\tDE_REF 1\n\tDEC\n')
                 
                 self.push_sem(f)
             
@@ -1211,8 +1252,14 @@ class SyntaticalAnalyzer:
                     attrib=EXPRESSAO_F(type=self.int_)
                 )
                 
-                self.output_file.write(f'\tDUP\n\tDUP\n\tDE_REF 1\n\tDEC\n')
-                self.output_file.write(f'\tSTORE_REF 1\n\tDE_REF 1\n\tINC\n')
+                # LV--: Load, duplicate, decrement, store (value on stack is OLD value)
+                # Pattern: LOAD_VAR n, DUP, DEC, STORE_VAR n
+                if lv.attrib.obj and (lv.attrib.obj.eKind == T_kind.VAR_ or lv.attrib.obj.eKind == T_kind.PARAM_):
+                    idx = lv.attrib.obj.kind_info.nIndex
+                    self.output_file.write(f'\tLOAD_VAR {idx}\n\tDUP\n\tDEC\n\tSTORE_VAR {idx}\n')
+                else:
+                    self.output_file.write(f'\tDUP\n\tDUP\n\tDE_REF 1\n\tDEC\n')
+                    self.output_file.write(f'\tSTORE_REF 1\n\tDE_REF 1\n\tINC\n')
 
                 self.push_sem(f)
 
@@ -1518,7 +1565,7 @@ class SyntaticalAnalyzer:
                 
                 lv: T_attrib = T_attrib(
                     t_nont=T_nont.VALOR_ESQUERDO_,
-                    attrib=VALOR_ESQUERDO(type=None)
+                    attrib=VALOR_ESQUERDO(type=None, obj=None)
                 )
                 
                 if p.eKind != T_kind.VAR_ and p.eKind != T_kind.PARAM_:
@@ -1527,7 +1574,7 @@ class SyntaticalAnalyzer:
                     lv.attrib.type = self.universal_
                 else:
                     lv.attrib.type = p.kind_info.pType
-                    self.output_file.write(f'\tLOAD_REF {p.kind_info.nIndex}\n')
+                    lv.attrib.obj = p  # Store the object for code generation
                 
                 self.push_sem(lv)
             
