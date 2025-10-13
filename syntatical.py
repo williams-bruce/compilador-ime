@@ -449,9 +449,25 @@ class SyntaticalAnalyzer:
                 # Preserve nIndex from N_FUNCAO
                 saved_nIndex = o.kind_info.nIndex if o.kind_info else 0
                 
+                # Make a copy of the parameter list to avoid including local vars later
+                # Walk through the parameter list and copy only parameters
+                param_list_copy = None
+                param_last = None
+                p = lp.attrib.list
+                while p is not None and p.eKind == T_kind.PARAM_:
+                    # Create a copy of this parameter
+                    p_copy = Object(p.nName, None, p.eKind, p.kind_info)
+                    if param_list_copy is None:
+                        param_list_copy = p_copy
+                        param_last = p_copy
+                    else:
+                        param_last.pNext = p_copy
+                        param_last = p_copy
+                    p = p.pNext
+                
                 o.kind_info = Function(
                     pRetType = t.attrib.type,
-                    pParams = lp.attrib.list,
+                    pParams = param_list_copy,  # Use the copy
                     nParams = lp.attrib.nSize,
                     nVars = 0,  # nVars counts only local variables (not parameters)
                     nIndex = saved_nIndex  # Preserve the index from N_FUNCAO
@@ -1307,9 +1323,10 @@ class SyntaticalAnalyzer:
                     attrib=EXPRESSAO_F(type=mc.attrib.type)
                 )
                 
-                # Check parameter count
-                if not mc.attrib.err:
-                    if mc.attrib.param is not None:
+                # Check parameter count using LISTA_EXPRESSOES result (le), not MARCADOR_C (mc)
+                # le.attrib.param will be None if all parameters were satisfied
+                if not le.attrib.err:
+                    if le.attrib.param is not None:
                         self._error(f"SemanticError: Function call with too few arguments")
                     
                 self.output_file.write(f'\tCALL {fun.kind_info.nIndex}\n')
@@ -1716,10 +1733,13 @@ class SyntaticalAnalyzer:
         
         
     def _error(self, message: str):
+        print('--------------------------------')
         print(message)
+        print()
         print(f"current token: {self.current_token}")
         print(f"current id token: {self.current_id_token}")
         print(f"current const token: {self.current_const_token}")
+        print('--------------------------------')
     
     
     def get_type_size(self, obj: Object) -> int:
