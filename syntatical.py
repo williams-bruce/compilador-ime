@@ -56,7 +56,7 @@ class SyntaticalAnalyzer:
     
     
     def _new_label(self):
-        label = f"L{self._num_labels}"
+        label = self._num_labels
         self._num_labels += 1
         return label
 
@@ -145,7 +145,7 @@ class SyntaticalAnalyzer:
             if word == token_type:
                 return i
         
-        raise Exception(f"Index not found for token type: {token_type}")
+        raise Exception(f"Index not found for token: {self.current_token}")
 
 
     def action(self, q, a):
@@ -194,6 +194,9 @@ class SyntaticalAnalyzer:
             q = self.top()
             if self.debug:
                 print('--------------------------------')
+        
+        # Close the output file
+        self.output_file.close()
         
         print("\nSyntatical analysis completed successfully")
 
@@ -391,6 +394,8 @@ class SyntaticalAnalyzer:
                 self.push_sem(dc)
 
             case T_rule.DECLARACAO_FUNCAO.value:
+                # Write END_FUNC here (after BLOCO has been reduced)
+                self.output_file.write(f'END_FUNC\n')
                 
                 self.scope_manager.end_block()
                 
@@ -440,23 +445,28 @@ class SyntaticalAnalyzer:
                 idd = self.top_sem(3)
                 
                 o = idd.attrib.obj
+                # Preserve nIndex from N_FUNCAO
+                saved_nIndex = o.kind_info.nIndex if o.kind_info else 0
+                
                 o.kind_info = Function(
                     pRetType = t.attrib.type,
                     pParams = lp.attrib.list,
                     nParams = lp.attrib.nSize,
-                    nVars = lp.attrib.nSize
+                    nVars = lp.attrib.nSize,
+                    nIndex = saved_nIndex  # Preserve the index from N_FUNCAO
                 )
                 
                 self.current_function = o
                 
                 self.output_file.write(
-                    f'BEGIN_FUNC {o.kind_info.nIndex}, {o.kind_info.nParams}, {o.kind_info.nVars}\n'
+                    f'BEGIN_FUNC {o.kind_info.nIndex} {o.kind_info.nParams} {o.kind_info.nVars}\n'
                 )
                 
                 mf: T_attrib = T_attrib(
                     T_nont.MARCADOR_FUNCAO_,
                     MARCADOR_FUNCAO(
-                        offset = self.output_file.tell() - 3
+                        offset = self.output_file.tell() - 3,
+                        func_obj = o  # Store reference to function object
                     )
                 )
                 
@@ -538,36 +548,65 @@ class SyntaticalAnalyzer:
                 self.push_sem(lp)
             
             case T_rule.BLOCO.value:
-                mf = self.top_sem()
-                idd = self.top_sem(4)
+                # bloco -> LEFT_BRACES lista_declaracao_variaveis lista_comandos RIGHT_BRACES
+                # Pop lista_comandos and lista_declaracao_variaveis
+                lc = self.top_sem()       # lista_comandos
+                ldv = self.top_sem(1)     # lista_declaracao_variaveis
+                self.pop_sem(2)
                 
-                o = idd.attrib.obj
-                offset = mf.attrib.offset
-                self.output_file.write(
-                    f'END_FUNC\n'
-                )
-                current = self.output_file.tell()
-                self.output_file.seek(offset, os.SEEK_SET)
-                self.output_file.write(f'{o.kind_info.nVars}')
-                self.output_file.seek(current, os.SEEK_SET)
+                # Find MARCADOR_FUNCAO to update nVars if this is a function block
+                mf = None
+                for i in range(len(self.stack_sem)):
+                    item = self.top_sem(i)
+                    if item and item.t_nont == T_nont.MARCADOR_FUNCAO_:
+                        mf = item
+                        break
+                
+                # If this is a function's block, update the nVars in BEGIN_FUNC
+                # but DON'T write END_FUNC (that's done in DECLARACAO_FUNCAO)
+                if mf is not None and mf.attrib is not None:
+                    o = mf.attrib.func_obj
+                    offset = mf.attrib.offset
+                    
+                    # Update nVars in the BEGIN_FUNC line
+                    current = self.output_file.tell()
+                    self.output_file.seek(offset, os.SEEK_SET)
+                    self.output_file.write(f'{o.kind_info.nVars}')
+                    self.output_file.seek(current, os.SEEK_SET)
+                
+                # Push BLOCO to maintain stack consistency for COMANDO_BLOCO
+                bloco_attrib = T_attrib(T_nont.BLOCO_, None)
+                self.push_sem(bloco_attrib)
             
             case T_rule.LISTA_DECLARACAO_VARIAVEIS_REC.value:
-                pass
+                # Pop declaracao_variavel and previous lista_declaracao_variaveis
+                self.pop_sem(2)
+                # Push nothing - list rules don't need to maintain stack items
+                ldv: T_attrib = T_attrib(T_nont.LISTA_DECLARACAO_VARIAVEIS_, None)
+                self.push_sem(ldv)
             
             case T_rule.LISTA_DECLARACAO_VARIAVEIS.value:
-                pass
+                # Pop single declaracao_variavel
+                self.pop_sem()
+                ldv: T_attrib = T_attrib(T_nont.LISTA_DECLARACAO_VARIAVEIS_, None)
+                self.push_sem(ldv)
             
             case T_rule.LISTA_COMANDOS_REC.value:
-                pass
+                # Pop comando and previous lista_comandos
+                self.pop_sem(2)
+                lc: T_attrib = T_attrib(T_nont.LISTA_COMANDOS_, None)
+                self.push_sem(lc)
             
             case T_rule.LISTA_COMANDOS.value:
-                pass
+                # Pop single comando
+                self.pop_sem()
+                lc: T_attrib = T_attrib(T_nont.LISTA_COMANDOS_, None)
+                self.push_sem(lc)
             
             case T_rule.DECLARACAO_VARIAVEL.value:
                 t: T_attrib = self.top_sem()
                 li: T_attrib = self.top_sem(1)
                 self.pop_sem(2)
-                self._error(f"Bora tentar pegar o erro aqui:")
                 nnn = self.current_function.kind_info.nVars
                 
                 p: Optional[Object] = li.attrib.list
@@ -632,7 +671,12 @@ class SyntaticalAnalyzer:
                 self.push_sem(mt)
             
             case T_rule.ME.value:
-                mt = self.top_sem(1)
+                mt, mt_pos = self.find_in_stack(T_nont.MT_)
+                
+                if mt is None:
+                    self._error("SemanticError: Could not find MT in stack for ME")
+                    return
+                
                 label1 = mt.attrib.label
                 label2 = self._new_label()
                 
@@ -646,21 +690,27 @@ class SyntaticalAnalyzer:
                 self.push_sem(me)
             
             case T_rule.MW.value:
-                label = self._new_label()
+                # Generate label for loop start
+                label_start = self._new_label()
                 
                 mw: T_attrib = T_attrib(
                     T_nont.MW_,
-                    MW(label=label)
+                    MW(label=label_start)
                 )
                 
-                self.output_file.write(f'L{label}:\n')
+                self.output_file.write(f'L{label_start}:\n')
                 
                 self.push_sem(mw)
                 
             case T_rule.COMANDO_IF.value:
-                mt = self.top_sem(1)
-                # pop the expression, MT and S
-                self.pop_sem(3)
+                mt, mt_pos = self.find_in_stack(T_nont.MT_)
+                
+                if mt is None:
+                    self._error("SemanticError: Could not find MT in stack for COMANDO_IF")
+                    return
+                
+                # Pop all items up to and including MT
+                self.pop_sem(mt_pos + 1)
                 label = mt.attrib.label
                 
                 self.output_file.write(f'L{label}:\n')
@@ -673,9 +723,15 @@ class SyntaticalAnalyzer:
                 self.push_sem(s)
             
             case T_rule.COMANDO_IF_ELSE.value:
-                me = self.top_sem(1)
-                # pop the expression MT and S
-                self.pop_sem(5)
+                me, me_pos = self.find_in_stack(T_nont.ME_)
+                
+                if me is None:
+                    self._error("SemanticError: Could not find ME in stack for COMANDO_IF_ELSE")
+                    return
+                
+                # Pop all items up to and including ME
+                self.pop_sem(me_pos + 1)
+                
                 label = me.attrib.label
                 
                 self.output_file.write(f'L{label}:\n')
@@ -688,14 +744,30 @@ class SyntaticalAnalyzer:
                 self.push_sem(s)
             
             case T_rule.COMANDO_WHILE.value:
-                mt = self.top_sem(1)
-                mw = self.top_sem(3)
-                self.pop_sem(4)
+                # Rule 37: comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
+                # Stack should have: [..., mw, expressao, mt, comando]
+                # Find MW and MT in stack
+                mt, mt_pos = self.find_in_stack(T_nont.MT_)
+                mw, mw_pos = self.find_in_stack(T_nont.MW_)
                 
-                label1 = mw.attrib.label
-                label2 = mt.attrib.label
+                if mw is None or mt is None:
+                    self._error("SemanticError: Could not find MW or MT in stack for COMANDO_WHILE")
+                    s = T_attrib(T_nont.COMANDO_, None)
+                    self.push_sem(s)
+                    return
                 
-                self.output_file.write(f'\tJMP_BW L{label1}\nL{label2}:\n')
+                # Pop all items up to and including the deeper one (MW)
+                self.pop_sem(max(mt_pos, mw_pos) + 1)
+                
+                label_start = mw.attrib.label
+                label_end = mt.attrib.label
+                
+                # MT already wrote TJMP_FW L_end after the expression
+                # Now we just need to:
+                #   - Write JMP_BW to loop start
+                #   - Write the end label
+                self.output_file.write(f'\tJMP_BW L{label_start}\n')
+                self.output_file.write(f'L{label_end}:\n')
                 
                 s: T_attrib = T_attrib(
                     T_nont.COMANDO_,
@@ -705,8 +777,13 @@ class SyntaticalAnalyzer:
             
             case T_rule.COMANDO_DO.value:
                 e = self.top_sem()
-                mw = self.top_sem(2)
-                self.pop_sem(3)
+                mw, mw_pos = self.find_in_stack(T_nont.MW_)
+                
+                if mw is None:
+                    self._error("SemanticError: Could not find MW in stack for COMANDO_DO")
+                    return
+                
+                self.pop_sem(mw_pos + 1)
                 
                 label = mw.attrib.label
                 t_: Object = e.attrib.type
@@ -739,13 +816,22 @@ class SyntaticalAnalyzer:
                 lv = self.top_sem(1)
                 self.pop_sem(2)
                 
+                if lv.t_nont != T_nont.VALOR_ESQUERDO_:
+                    self._error(f"SemanticError: Expected VALOR_ESQUERDO but got {lv.t_nont}")
+                    # Push dummy to maintain stack
+                    s: T_attrib = T_attrib(T_nont.COMANDO_, None)
+                    self.push_sem(s)
+                    return
+                
                 t1: Object = lv.attrib.type
                 t2: Object = e.attrib.type
                 
                 if not self.check_types(t1, t2):
                     self._error(f"SemanticError: Type mismatch. Left value type: {t1.eKind}. Expression type: {t2.eKind}")
                 
-                self.output_file.write(f'\tSTORE_REF {t1.kind_info.nSize}\n')
+                nSize = self.get_type_size(t1)
+                
+                self.output_file.write(f'\tSTORE_REF {nSize}\n')
                 
                 s: T_attrib = T_attrib(
                     T_nont.COMANDO_,
@@ -758,7 +844,17 @@ class SyntaticalAnalyzer:
                 pass
             
             case T_rule.COMANDO_RETURN.value:
-                pass
+                e = self.top_sem()
+                self.pop_sem()
+                
+                if not self.check_types(e.attrib.type, self.current_function.kind_info.pRetType):
+                    self._error(f"SemanticError: Return type mismatch")
+                
+                self.output_file.write(f'\tRET\n')
+                
+                s = T_attrib(T_nont.COMANDO_, None)
+                
+                self.push_sem(s)
             
             case T_rule.COMANDO_CONTINUE.value:
                 pass
@@ -1033,13 +1129,21 @@ class SyntaticalAnalyzer:
             case T_rule.EXPRESSAO_F_LEFT_VALUE.value:
                 lv: T_attrib = self.top_sem()
                 self.pop_sem()
+                
+                if lv.t_nont != T_nont.VALOR_ESQUERDO_:
+                    self._error(f"SemanticError: Expected VALOR_ESQUERDO but got {lv.t_nont}")
+                    # Push dummy para manter consistência da pilha
+                    f = T_attrib(t_nont=T_nont.EXPRESSAO_F_, attrib=EXPRESSAO_F(type=self.universal_))
+                    self.push_sem(f)
+                    return
 
                 f: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_F_,
                     attrib=EXPRESSAO_F(type=lv.attrib.type)
                 )
                 
-                nnn = lv.attrib.type.kind_info.nSize
+                nnn = self.get_type_size(lv.attrib.type)
+                    
                 self.output_file.write(f'\tDE_REF {nnn}\n')
                 
                 self.push_sem(f)
@@ -1056,8 +1160,8 @@ class SyntaticalAnalyzer:
                     attrib=EXPRESSAO_F(type=self.int_)
                 )
                 
-                self.output_file.write(f'\tDUP\n\tDUP\tDE_REF 1\n')
-                self.output_file.write(f'\tINC\n\tSTORE_REF 1\tDE_REF 1\n')
+                self.output_file.write(f'\tDUP\n\tDUP\n\tDE_REF 1\n')
+                self.output_file.write(f'\tINC\n\tSTORE_REF 1\n\tDE_REF 1\n')
                 
                 self.push_sem(f)
             
@@ -1073,8 +1177,8 @@ class SyntaticalAnalyzer:
                     attrib=EXPRESSAO_F(type=self.int_)
                 )
                 
-                self.output_file.write(f'\tDUP\n\tDUP\tDE_REF 1\n')
-                self.output_file.write(f'\tDEC\n\tSTORE_REF 1\tDE_REF 1\n')
+                self.output_file.write(f'\tDUP\n\tDUP\n\tDE_REF 1\n')
+                self.output_file.write(f'\tDEC\n\tSTORE_REF 1\n\tDE_REF 1\n')
                 
                 self.push_sem(f)
             
@@ -1090,8 +1194,8 @@ class SyntaticalAnalyzer:
                     attrib=EXPRESSAO_F(type=self.int_)
                 )
                 
-                self.output_file.write(f'\tDUP\n\tDUP\tDE_REF 1\n\tINC\n')
-                self.output_file.write(f'\tSTORE_REF 1\tDE_REF 1\n\tDEC\n')
+                self.output_file.write(f'\tDUP\n\tDUP\n\tDE_REF 1\n\tINC\n')
+                self.output_file.write(f'\tSTORE_REF 1\n\tDE_REF 1\n\tDEC\n')
                 
                 self.push_sem(f)
             
@@ -1107,8 +1211,8 @@ class SyntaticalAnalyzer:
                     attrib=EXPRESSAO_F(type=self.int_)
                 )
                 
-                self.output_file.write(f'\tDUP\n\tDUP\tDE_REF 1\n\tDEC\n')
-                self.output_file.write(f'\tSTORE_REF 1\tDE_REF 1\n\tINC\n')
+                self.output_file.write(f'\tDUP\n\tDUP\n\tDE_REF 1\n\tDEC\n')
+                self.output_file.write(f'\tSTORE_REF 1\n\tDE_REF 1\n\tINC\n')
 
                 self.push_sem(f)
 
@@ -1124,23 +1228,44 @@ class SyntaticalAnalyzer:
                 self.push_sem(f)
 
             case T_rule.EXPRESSAO_F_IDU_LEFT_PARENTHESIS.value:
-                mc = self.top_sem(1)
-                idu = self.top_sem(2)
+                # Rule 66: expressao_f -> idu marcador_c LEFT_PARENTHESIS lista_expressoes RIGHT_PARENTHESIS
+                # Stack should have: [..., idu, marcador_c, lista_expressoes]
+                # Pop lista_expressoes, marcador_c, idu (3 items)
+                
+                le = self.top_sem()      # lista_expressoes
+                mc = self.top_sem(1)     # marcador_c
+                idu = self.top_sem(2)    # idu
+                
+                if idu.t_nont != T_nont.IDU_:
+                    self._error(f"SemanticError: Expected IDU but got {idu.t_nont} in EXPRESSAO_F_IDU_LEFT_PARENTHESIS")
+                    # Still need to pop and push to maintain stack
+                    self.pop_sem(3)
+                    f = T_attrib(t_nont=T_nont.EXPRESSAO_F_, attrib=EXPRESSAO_F(type=self.universal_))
+                    self.push_sem(f)
+                    return
+                
                 self.pop_sem(3)
                 
                 fun: Object = idu.attrib.obj
+                
+                # Check if it's a valid function
+                if fun.eKind != T_kind.FUNCTION_ or fun.kind_info is None:
+                    self._error(f"SemanticError: '{idu.attrib.name}' is not a function or not defined")
+                    f = T_attrib(t_nont=T_nont.EXPRESSAO_F_, attrib=EXPRESSAO_F(type=self.universal_))
+                    self.push_sem(f)
+                    return
                 
                 f = T_attrib(
                     t_nont=T_nont.EXPRESSAO_F_,
                     attrib=EXPRESSAO_F(type=mc.attrib.type)
                 )
                 
+                # Check parameter count
                 if not mc.attrib.err:
                     if mc.attrib.param is not None:
-                        self._error(f"SemanticError: LE with too few args")
+                        self._error(f"SemanticError: Function call with too few arguments")
                     
-                if not self.error_flag:
-                    self.output_file.write(f'\tCALL {fun.kind_info.nIndex}\n')
+                self.output_file.write(f'\tCALL {fun.kind_info.nIndex}\n')
 
                 self.push_sem(f)
 
@@ -1176,57 +1301,62 @@ class SyntaticalAnalyzer:
 
                 self.push_sem(f0)
             
-            case T_rule.EXPRESSAO_F_TRUE.value:
+            case T_rule.EXPRESSAO_F_TRUE.value: 
+                self.pop_sem() # desempilha TRUE
                 f0: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_F_,
                     attrib=EXPRESSAO_F(type=self.bool_)
                 )
                 
-                nnn = self.current_id_token.secondary_token
+                nnn = self.current_const_token.secondary_token
                 self.output_file.write(f'\tLOAD_CONST {nnn}\n')
 
                 self.push_sem(f0)
             
             case T_rule.EXPRESSAO_F_FALSE.value:
+                self.pop_sem() # desempilha FALSE
                 f0: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_F_,
                     attrib=EXPRESSAO_F(type=self.bool_)
                 )
 
-                nnn = self.current_id_token.secondary_token
+                nnn = self.current_const_token.secondary_token
                 self.output_file.write(f'\tLOAD_CONST {nnn}\n')
 
                 self.push_sem(f0)
             
             case T_rule.EXPRESSAO_F_CHARACTER.value:
+                self.pop_sem() # desempilha CHARACTER
                 f0: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_F_,
                     attrib=EXPRESSAO_F(type=self.char_)
                 )
 
-                nnn = self.current_id_token.secondary_token
+                nnn = self.current_const_token.secondary_token
                 self.output_file.write(f'\tLOAD_CONST {nnn}\n')
 
                 self.push_sem(f0)
             
             case T_rule.EXPRESSAO_F_STRINGVAL.value:
+                self.pop_sem() # desempilha STRINGVAL
                 f0: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_F_,
                     attrib=EXPRESSAO_F(type=self.string_)
                 )
 
-                nnn = self.current_id_token.secondary_token
+                nnn = self.current_const_token.secondary_token
                 self.output_file.write(f'\tLOAD_CONST {nnn}\n')
 
                 self.push_sem(f0)
             
             case T_rule.EXPRESSAO_F_NUMERAL.value:
+                self.pop_sem() # desempilha NUMERAL
                 f0: T_attrib = T_attrib(
                     t_nont=T_nont.EXPRESSAO_F_,
                     attrib=EXPRESSAO_F(type=self.int_)
                 )
 
-                nnn = self.current_id_token.secondary_token
+                nnn = self.current_const_token.secondary_token
                 self.output_file.write(f'\tLOAD_CONST {nnn}\n')
 
                 self.push_sem(f0)
@@ -1234,6 +1364,7 @@ class SyntaticalAnalyzer:
             case T_rule.LISTA_EXPRESSOES_REC.value:
                 e = self.top_sem()
                 le1 = self.top_sem(1)
+                self.pop_sem(2)
                 
                 le0 = T_attrib(
                     t_nont=T_nont.LISTA_EXPRESSOES_,
@@ -1261,8 +1392,39 @@ class SyntaticalAnalyzer:
                         
             
             case T_rule.LISTA_EXPRESSOES.value:
-                e: T_attrib = self.top_sem()
-                mc: T_attrib = self.top_sem(1)
+                # Rule 75: lista_expressoes -> expressao
+                # Stack should have: [..., expressao]
+                # But we also need marcador_c which should be BEFORE expressao
+                # Actually looking at the grammar, marcador_c is in the parent rule (rule 66)
+                # So stack is: [..., marcador_c, expressao]
+                # Wait, no. Let me think about this more carefully.
+                
+                # When we reduce lista_expressoes -> expressao:
+                # - We have expressao on top
+                # - We should NOT see marcador_c here, that's in the parent rule
+                # But LISTA_EXPRESSOES needs to know about the function parameters
+                # This is set in MARCADOR_C
+                
+                # Looking at the reference code, LISTA_EXPRESSOES takes MC from stack[-1]
+                # This means MC is still on the stack below
+                
+                e: T_attrib = self.top_sem()      # expressao
+                # MC should be below the expressao, let's find it
+                mc = None
+                for i in range(1, min(10, len(self.stack_sem))):
+                    item = self.top_sem(i)
+                    if item and item.t_nont == T_nont.MARCADOR_C_:
+                        mc = item
+                        break
+                
+                if mc is None:
+                    self._error("SemanticError: Could not find MARCADOR_C for LISTA_EXPRESSOES")
+                    self.pop_sem()
+                    le = T_attrib(T_nont.LISTA_EXPRESSOES_, LISTA_EXPRESSOES(None, True, 0))
+                    self.push_sem(le)
+                    return
+                
+                self.pop_sem()  # Only pop expressao, MC stays
                 
                 le: T_attrib = T_attrib(
                     t_nont=T_nont.LISTA_EXPRESSOES_,
@@ -1332,15 +1494,17 @@ class SyntaticalAnalyzer:
                 t_ = lv1.attrib.type
                 
                 if t_ == self.string_:
-                    lv0.attrib = VALOR_ESQUERDO(type=self.char_)
+                    lv0.attrib.type=self.char_
                 elif t_.eKind != T_kind.ARRAY_TYPE_:
                     if t_.eKind != T_kind.UNIVERSAL_:
                         self._error(f"SemanticError: Kind not array")
-                        lv0.attrib = VALOR_ESQUERDO(type=self.universal_)
-                    lv0.attrib = VALOR_ESQUERDO(type=self.universal_)
+                        lv0.attrib.type = self.universal_
+                    lv0.attrib.type = self.universal_
                 else:
-                    lv0.attrib = VALOR_ESQUERDO(type=t_.kind_info.pElemType)
-                    self.output_file.write(f'\tMUL {t_.kind_info.pElemType.kind_info.nSize}\n\tADD\n')
+                    elem_type = t_.kind_info.pElemType
+                    lv0.attrib.type = elem_type
+                    elem_size = self.get_type_size(elem_type)
+                    self.output_file.write(f'\tMUL {elem_size}\n\tADD\n')
                 
                 if not self.check_types(e.attrib.type, self.int_):
                     self._error(f"SemanticError: Invalid index type")
@@ -1360,10 +1524,10 @@ class SyntaticalAnalyzer:
                 if p.eKind != T_kind.VAR_ and p.eKind != T_kind.PARAM_:
                     if p.eKind != T_kind.UNIVERSAL_:
                         self._error(f"SemanticError: Kind not VAR")
-                    lv.attrib = VALOR_ESQUERDO(type=self.universal_)
+                    lv.attrib.type = self.universal_
                 else:
-                    lv.attrib = VALOR_ESQUERDO(type=p.kind_info.pType)
-                    self.output_file.write(f'\tLOAD_REF {p.kind_info.pType.kind_info.nIndex}\n')
+                    lv.attrib.type = p.kind_info.pType
+                    self.output_file.write(f'\tLOAD_REF {p.kind_info.nIndex}\n')
                 
                 self.push_sem(lv)
             
@@ -1493,6 +1657,15 @@ class SyntaticalAnalyzer:
         for item in self.stack_sem:
             print(f'item: {item.t_nont}')
         print("--------------------------------")
+    
+    
+    def find_in_stack(self, t_nont_type, max_depth=20):
+        """Find an item in the semantic stack by its t_nont type."""
+        for i in range(min(max_depth, len(self.stack_sem))):
+            item = self.top_sem(i)
+            if item and item.t_nont == t_nont_type:
+                return item, i
+        return None, -1
         
         
     def _error(self, message: str):
@@ -1500,3 +1673,14 @@ class SyntaticalAnalyzer:
         print(f"current token: {self.current_token}")
         print(f"current id token: {self.current_id_token}")
         print(f"current const token: {self.current_const_token}")
+    
+    
+    def get_type_size(self, obj: Object) -> int:
+        """Retorna o tamanho de um tipo, tratando tipos escalares corretamente."""
+        if obj.eKind == T_kind.SCALAR_TYPE_:
+            # Tipos escalares básicos têm tamanho 1
+            return 1
+        elif obj.kind_info is not None and hasattr(obj.kind_info, 'nSize'):
+            return obj.kind_info.nSize
+        else:
+            return 1  # Valor padrão

@@ -1,0 +1,8 @@
+function soma(a: integer, b: integer): integer
+{
+    var resultado: integer;
+    resultado = a + b;
+    return resultado;
+}
+
+

@@ -1,0 +1,12 @@
+function teste(n: integer): integer
+{
+    var i, j, soma: integer;
+    i = 0;
+    soma = 0;
+    
+    while(i < n)
+        while(j < n)
+            soma = soma + 1;
+    
+    return soma;
+}

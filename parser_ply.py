@@ -211,7 +211,7 @@ def p_mw(p):
 def p_comando(p):
     """comando : IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando %prec LOWER_THAN_ELSE
                 | IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando ELSE me comando
-                | WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+                | WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
                 | DO mw comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
                 | new_block bloco
                 | valor_esquerdo EQUALS expressao SEMI_COLON

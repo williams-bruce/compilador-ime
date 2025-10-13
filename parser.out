@@ -39,7 +39,7 @@ Rule 33    me -> <empty>
 Rule 34    mw -> <empty>
 Rule 35    comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
 Rule 36    comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando ELSE me comando
-Rule 37    comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+Rule 37    comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
 Rule 38    comando -> DO mw comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
 Rule 39    comando -> new_block bloco
 Rule 40    comando -> valor_esquerdo EQUALS expressao SEMI_COLON
@@ -171,7 +171,7 @@ lista_parametros     : 17 22
 marcador_c           : 66
 marcador_funcao      : 17
 me                   : 36
-mt                   : 35 36
+mt                   : 35 36 37
 mw                   : 37 38
 n_funcao             : 17
 new_block            : 13 39
@@ -964,7 +964,7 @@ state 64
     (29) declaracao_variavel -> . VAR lista_identificadores COLON tipo SEMI_COLON
     (35) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
     (36) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando ELSE me comando
-    (37) comando -> . WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    (37) comando -> . WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
     (38) comando -> . DO mw comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
     (39) comando -> . new_block bloco
     (40) comando -> . valor_esquerdo EQUALS expressao SEMI_COLON
@@ -1015,7 +1015,7 @@ state 66
     (27) lista_comandos -> lista_comandos . comando
     (35) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
     (36) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando ELSE me comando
-    (37) comando -> . WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    (37) comando -> . WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
     (38) comando -> . DO mw comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
     (39) comando -> . new_block bloco
     (40) comando -> . valor_esquerdo EQUALS expressao SEMI_COLON
@@ -1083,7 +1083,7 @@ state 69
 
 state 70
 
-    (37) comando -> WHILE . mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    (37) comando -> WHILE . mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
     (34) mw -> .
 
     LEFT_PARENTHESIS reduce using rule 34 (mw -> .)
@@ -1339,7 +1339,7 @@ state 80
 
 state 81
 
-    (37) comando -> WHILE mw . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    (37) comando -> WHILE mw . LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
 
     LEFT_PARENTHESIS shift and go to state 111
 
@@ -1349,7 +1349,7 @@ state 82
     (38) comando -> DO mw . comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
     (35) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
     (36) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando ELSE me comando
-    (37) comando -> . WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    (37) comando -> . WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
     (38) comando -> . DO mw comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
     (39) comando -> . new_block bloco
     (40) comando -> . valor_esquerdo EQUALS expressao SEMI_COLON
@@ -2134,7 +2134,7 @@ state 110
 
 state 111
 
-    (37) comando -> WHILE mw LEFT_PARENTHESIS . expressao RIGHT_PARENTHESIS comando
+    (37) comando -> WHILE mw LEFT_PARENTHESIS . expressao RIGHT_PARENTHESIS mt comando
     (44) expressao -> . expressao AND expressao_l
     (45) expressao -> . expressao OR expressao_l
     (46) expressao -> . expressao_l
@@ -3140,7 +3140,7 @@ state 138
 
 state 139
 
-    (37) comando -> WHILE mw LEFT_PARENTHESIS expressao . RIGHT_PARENTHESIS comando
+    (37) comando -> WHILE mw LEFT_PARENTHESIS expressao . RIGHT_PARENTHESIS mt comando
     (44) expressao -> expressao . AND expressao_l
     (45) expressao -> expressao . OR expressao_l
 
@@ -3570,7 +3570,7 @@ state 157
     (36) comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt . comando ELSE me comando
     (35) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
     (36) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando ELSE me comando
-    (37) comando -> . WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    (37) comando -> . WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
     (38) comando -> . DO mw comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
     (39) comando -> . new_block bloco
     (40) comando -> . valor_esquerdo EQUALS expressao SEMI_COLON
@@ -3599,35 +3599,19 @@ state 157
 
 state 158
 
-    (37) comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS . comando
-    (35) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
-    (36) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando ELSE me comando
-    (37) comando -> . WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
-    (38) comando -> . DO mw comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
-    (39) comando -> . new_block bloco
-    (40) comando -> . valor_esquerdo EQUALS expressao SEMI_COLON
-    (41) comando -> . BREAK SEMI_COLON
-    (42) comando -> . CONTINUE SEMI_COLON
-    (43) comando -> . RETURN expressao SEMI_COLON
-    (18) new_block -> .
-    (76) valor_esquerdo -> . valor_esquerdo DOT id
-    (77) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
-    (78) valor_esquerdo -> . idu
-    (80) idu -> . ID
+    (37) comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS . mt comando
+    (32) mt -> .
 
-    IF              shift and go to state 69
-    WHILE           shift and go to state 70
-    DO              shift and go to state 71
-    BREAK           shift and go to state 74
-    CONTINUE        shift and go to state 75
-    RETURN          shift and go to state 76
-    LEFT_BRACES     reduce using rule 18 (new_block -> .)
-    ID              shift and go to state 28
+    IF              reduce using rule 32 (mt -> .)
+    WHILE           reduce using rule 32 (mt -> .)
+    DO              reduce using rule 32 (mt -> .)
+    BREAK           reduce using rule 32 (mt -> .)
+    CONTINUE        reduce using rule 32 (mt -> .)
+    RETURN          reduce using rule 32 (mt -> .)
+    ID              reduce using rule 32 (mt -> .)
+    LEFT_BRACES     reduce using rule 32 (mt -> .)
 
-    comando                        shift and go to state 163
-    new_block                      shift and go to state 72
-    valor_esquerdo                 shift and go to state 73
-    idu                            shift and go to state 77
+    mt                             shift and go to state 163
 
 state 159
 
@@ -3739,19 +3723,35 @@ state 162
 
 state 163
 
-    (37) comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .
+    (37) comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt . comando
+    (35) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
+    (36) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando ELSE me comando
+    (37) comando -> . WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
+    (38) comando -> . DO mw comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
+    (39) comando -> . new_block bloco
+    (40) comando -> . valor_esquerdo EQUALS expressao SEMI_COLON
+    (41) comando -> . BREAK SEMI_COLON
+    (42) comando -> . CONTINUE SEMI_COLON
+    (43) comando -> . RETURN expressao SEMI_COLON
+    (18) new_block -> .
+    (76) valor_esquerdo -> . valor_esquerdo DOT id
+    (77) valor_esquerdo -> . valor_esquerdo LEFT_SQUARE expressao RIGHT_SQUARE
+    (78) valor_esquerdo -> . idu
+    (80) idu -> . ID
 
-    RIGHT_BRACES    reduce using rule 37 (comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
-    IF              reduce using rule 37 (comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
-    WHILE           reduce using rule 37 (comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
-    DO              reduce using rule 37 (comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
-    BREAK           reduce using rule 37 (comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
-    CONTINUE        reduce using rule 37 (comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
-    RETURN          reduce using rule 37 (comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
-    ID              reduce using rule 37 (comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
-    LEFT_BRACES     reduce using rule 37 (comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
-    ELSE            reduce using rule 37 (comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando .)
+    IF              shift and go to state 69
+    WHILE           shift and go to state 70
+    DO              shift and go to state 71
+    BREAK           shift and go to state 74
+    CONTINUE        shift and go to state 75
+    RETURN          shift and go to state 76
+    LEFT_BRACES     reduce using rule 18 (new_block -> .)
+    ID              shift and go to state 28
 
+    comando                        shift and go to state 168
+    new_block                      shift and go to state 72
+    valor_esquerdo                 shift and go to state 73
+    idu                            shift and go to state 77
 
 state 164
 
@@ -3759,7 +3759,7 @@ state 164
     (44) expressao -> expressao . AND expressao_l
     (45) expressao -> expressao . OR expressao_l
 
-    RIGHT_PARENTHESIS shift and go to state 168
+    RIGHT_PARENTHESIS shift and go to state 169
     AND             shift and go to state 118
     OR              shift and go to state 119
 
@@ -3841,7 +3841,7 @@ state 166
     STRINGVAL       shift and go to state 109
     NUMERAL         shift and go to state 38
 
-    expressao                      shift and go to state 169
+    expressao                      shift and go to state 170
     expressao_l                    shift and go to state 90
     expressao_r                    shift and go to state 91
     expressao_y                    shift and go to state 92
@@ -3868,16 +3868,32 @@ state 167
     ID              reduce using rule 33 (me -> .)
     LEFT_BRACES     reduce using rule 33 (me -> .)
 
-    me                             shift and go to state 170
+    me                             shift and go to state 171
 
 state 168
 
-    (38) comando -> DO mw comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS . SEMI_COLON
+    (37) comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando .
 
-    SEMI_COLON      shift and go to state 171
+    RIGHT_BRACES    reduce using rule 37 (comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando .)
+    IF              reduce using rule 37 (comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando .)
+    WHILE           reduce using rule 37 (comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando .)
+    DO              reduce using rule 37 (comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando .)
+    BREAK           reduce using rule 37 (comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando .)
+    CONTINUE        reduce using rule 37 (comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando .)
+    RETURN          reduce using rule 37 (comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando .)
+    ID              reduce using rule 37 (comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando .)
+    LEFT_BRACES     reduce using rule 37 (comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando .)
+    ELSE            reduce using rule 37 (comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando .)
 
 
 state 169
+
+    (38) comando -> DO mw comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS . SEMI_COLON
+
+    SEMI_COLON      shift and go to state 172
+
+
+state 170
 
     (74) lista_expressoes -> lista_expressoes COMMA expressao .
     (44) expressao -> expressao . AND expressao_l
@@ -3889,12 +3905,12 @@ state 169
     OR              shift and go to state 119
 
 
-state 170
+state 171
 
     (36) comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando ELSE me . comando
     (35) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
     (36) comando -> . IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando ELSE me comando
-    (37) comando -> . WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    (37) comando -> . WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
     (38) comando -> . DO mw comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
     (39) comando -> . new_block bloco
     (40) comando -> . valor_esquerdo EQUALS expressao SEMI_COLON
@@ -3916,12 +3932,12 @@ state 170
     LEFT_BRACES     reduce using rule 18 (new_block -> .)
     ID              shift and go to state 28
 
-    comando                        shift and go to state 172
+    comando                        shift and go to state 173
     new_block                      shift and go to state 72
     valor_esquerdo                 shift and go to state 73
     idu                            shift and go to state 77
 
-state 171
+state 172
 
     (38) comando -> DO mw comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON .
 
@@ -3937,7 +3953,7 @@ state 171
     ELSE            reduce using rule 38 (comando -> DO mw comando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON .)
 
 
-state 172
+state 173
 
     (36) comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando ELSE me comando .
 

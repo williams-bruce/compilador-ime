@@ -51,6 +51,7 @@ class DECLARACAO_FUNCAO:
 @dataclass
 class MARCADOR_FUNCAO:
     offset: int
+    func_obj: Object = None
 
 
 @dataclass

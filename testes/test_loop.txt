@@ -1,0 +1,11 @@
+function contagem(n: integer): integer
+{
+    var i, soma: integer;
+    i = 0;
+    soma = 0;
+    
+    while(i <= n)
+        soma = soma + i;
+    
+    return soma;
+}

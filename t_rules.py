@@ -39,7 +39,7 @@ class T_rule(Enum):
     MW = auto()                                 # 33   mw -> <empty>
     COMANDO_IF = auto()                         # 31   comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
     COMANDO_IF_ELSE = auto()                    # 32   comando -> IF LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando ELSE me comando
-    COMANDO_WHILE = auto()                      # 33   comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS comando
+    COMANDO_WHILE = auto()                      # 33   comando -> WHILE mw LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS mt comando
     COMANDO_DO = auto()                         # 34   comando -> DO mw commando WHILE LEFT_PARENTHESIS expressao RIGHT_PARENTHESIS SEMI_COLON
     COMANDO_BLOCO = auto()                      # 35   comando -> new_block bloco
     COMANDO_LEFT_VALUE_EQUALS = auto()          # 36   comando -> valor_esquerdo EQUALS expressao SEMI_COLON
