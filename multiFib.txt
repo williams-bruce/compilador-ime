@@ -1,0 +1,23 @@
+function multiFib(n:integer, m:integer): integer {
+    var x:integer;
+
+    if(n<2) 
+        return n;
+    else 
+        return (multiFib(n-1,m)+multiFib(n-2,m))*m;
+}
+
+function fib2Fat5(n:integer):integer {
+    var i, f:integer;
+    
+    i = 0;
+    f = 1;
+
+    while(i <= n) {
+        var kkkkk:integer;
+        f = f*multiFib(i,5)/2;
+        i = i + 1;
+    }
+
+    return f;
+}
